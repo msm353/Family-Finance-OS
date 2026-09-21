@@ -1,10 +1,23 @@
 import { db } from "../database/db";
-import { Expense } from "../models/Expense";
+import type { Expense } from "../models/Expense";
 
 export async function addExpense(expense: Expense) {
-  return db.expenses.add(expense);
+  try {
+    return await db.expenses.add(expense);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function getExpenses() {
-  return db.expenses.reverse().toArray();
+  return db.expenses.orderBy("id").reverse().toArray();
+}
+
+export async function deleteExpense(id: number) {
+  return db.expenses.delete(id);
+}
+
+export async function clearExpenses() {
+  return db.expenses.clear();
 }

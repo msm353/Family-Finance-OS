@@ -1,21 +1,22 @@
 import { useState } from "react";
+import { addExpense } from "../services/expenseService";
 
 export default function ExpenseForm() {
   const [storeName, setStoreName] = useState("");
   const [amount, setAmount] = useState("");
 
-  function handleSubmit() {
-    if (storeName.trim() === "") {
+  async function handleSubmit() {
+    if (!storeName.trim()) {
       alert("نام فروشگاه را وارد کنید.");
       return;
     }
 
-    if (amount.trim() === "") {
+    if (!amount.trim()) {
       alert("مبلغ را وارد کنید.");
       return;
     }
 
-    const confirmed = window.confirm(
+    const ok = window.confirm(
       `آیا این هزینه ثبت شود؟
 
 فروشگاه: ${storeName}
@@ -23,11 +24,23 @@ export default function ExpenseForm() {
 مبلغ: ${Number(amount).toLocaleString("fa-IR")} تومان`
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!ok) return;
 
-    alert("✅ هزینه آماده ثبت در دیتابیس است.");
+    await addExpense({
+      storeName,
+      amount: Number(amount),
+      category: "سایر",
+      paymentMethod: "کارت",
+      description: "",
+      date: new Date().toLocaleDateString("fa-IR"),
+      createdAt: new Date().toISOString(),
+      confirmed: true,
+    });
+
+    alert("✅ هزینه با موفقیت ذخیره شد.");
+
+    setStoreName("");
+    setAmount("");
   }
 
   return (
