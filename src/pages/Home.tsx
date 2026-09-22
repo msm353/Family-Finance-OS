@@ -3,19 +3,24 @@ import { useEffect, useState } from "react";
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseList from "../components/ExpenseList";
 import ExpenseSummary from "../components/ExpenseSummary";
+import ExpenseSearch from "../components/ExpenseSearch";
 
 import type { Expense } from "../models/Expense";
 import { getExpenses } from "../services/expenseService";
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [editingExpense, setEditingExpense] = useState<
-    Expense | undefined
-  >(undefined);
+  const [filteredExpenses, setFilteredExpenses] =
+    useState<Expense[]>([]);
+
+  const [editingExpense, setEditingExpense] =
+    useState<Expense | undefined>(undefined);
 
   async function loadExpenses() {
     const data = await getExpenses();
+
     setExpenses(data);
+    setFilteredExpenses(data);
   }
 
   useEffect(() => {
@@ -29,6 +34,29 @@ export default function Home() {
   function handleFinishedEditing() {
     setEditingExpense(undefined);
     loadExpenses();
+  }
+
+  function handleSearch(value: string) {
+    const text = value.trim().toLowerCase();
+
+    if (!text) {
+      setFilteredExpenses(expenses);
+      return;
+    }
+
+    const result = expenses.filter((expense) =>
+      expense.storeName
+        .toLowerCase()
+        .includes(text) ||
+      expense.category
+        .toLowerCase()
+        .includes(text) ||
+      expense.paymentMethod
+        .toLowerCase()
+        .includes(text)
+    );
+
+    setFilteredExpenses(result);
   }
 
   return (
@@ -52,7 +80,11 @@ export default function Home() {
         نسخه آزمایشی 0.1.0
       </p>
 
-      <ExpenseSummary expenses={expenses} />
+      <ExpenseSummary expenses={filteredExpenses} />
+
+      <ExpenseSearch
+        onSearch={handleSearch}
+      />
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
@@ -61,7 +93,7 @@ export default function Home() {
       />
 
       <ExpenseList
-        expenses={expenses}
+        expenses={filteredExpenses}
         onExpenseDeleted={loadExpenses}
         onExpenseEdit={handleEdit}
       />
@@ -74,7 +106,9 @@ export default function Home() {
 
       <h2>هدف پروژه</h2>
 
-      <p>سیستم مدیریت مالی خانوادگی کاملاً آفلاین</p>
+      <p>
+        سیستم مدیریت مالی خانوادگی کاملاً آفلاین
+      </p>
     </main>
   );
 }
