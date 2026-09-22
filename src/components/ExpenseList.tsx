@@ -1,23 +1,33 @@
-import { useEffect, useState } from "react";
 import type { Expense } from "../models/Expense";
-import { getExpenses } from "../services/expenseService";
+import { deleteExpense } from "../services/expenseService";
 
-export default function ExpenseList() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+type ExpenseListProps = {
+  expenses: Expense[];
+  onExpenseDeleted: () => void;
+};
 
-  useEffect(() => {
-    loadExpenses();
-  }, []);
+export default function ExpenseList({
+  expenses,
+  onExpenseDeleted,
+}: ExpenseListProps) {
+  async function handleDelete(id: number) {
+    const ok = window.confirm(
+      "آیا از حذف این هزینه مطمئن هستید؟"
+    );
 
-  async function loadExpenses() {
-    const data = await getExpenses();
-    setExpenses(data);
+    if (!ok) return;
+
+    await deleteExpense(id);
+
+    onExpenseDeleted();
+
+    alert("✅ هزینه حذف شد.");
   }
 
   if (expenses.length === 0) {
     return (
       <div style={{ marginTop: "30px" }}>
-        <h2>هزینه‌ها</h2>
+        <h2>هزینه‌های ثبت‌شده</h2>
         <p>هنوز هیچ هزینه‌ای ثبت نشده است.</p>
       </div>
     );
@@ -53,6 +63,21 @@ export default function ExpenseList() {
           <div>
             <strong>💳 پرداخت:</strong> {expense.paymentMethod}
           </div>
+
+          <button
+            onClick={() => {
+              if (expense.id !== undefined) {
+                handleDelete(expense.id);
+              }
+            }}
+            style={{
+              marginTop: "12px",
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            🗑 حذف
+          </button>
         </div>
       ))}
     </div>

@@ -1,7 +1,23 @@
+import { useEffect, useState } from "react";
+
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseList from "../components/ExpenseList";
 
+import type { Expense } from "../models/Expense";
+import { getExpenses } from "../services/expenseService";
+
 export default function Home() {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  async function loadExpenses() {
+    const data = await getExpenses();
+    setExpenses(data);
+  }
+
+  useEffect(() => {
+    loadExpenses();
+  }, []);
+
   return (
     <main
       style={{
@@ -23,9 +39,14 @@ export default function Home() {
         نسخه آزمایشی 0.1.0
       </p>
 
-      <ExpenseForm />
+      <ExpenseForm
+        onExpenseAdded={loadExpenses}
+      />
 
-      <ExpenseList />
+      <ExpenseList
+        expenses={expenses}
+        onExpenseDeleted={loadExpenses}
+      />
 
       <hr
         style={{

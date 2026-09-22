@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { addExpense } from "../services/expenseService";
 
-export default function ExpenseForm() {
+type ExpenseFormProps = {
+  onExpenseAdded: () => void;
+};
+
+export default function ExpenseForm({
+  onExpenseAdded,
+}: ExpenseFormProps) {
   const [storeName, setStoreName] = useState("");
   const [amount, setAmount] = useState("");
 
@@ -36,6 +42,8 @@ export default function ExpenseForm() {
       createdAt: new Date().toISOString(),
       confirmed: true,
     });
+
+    onExpenseAdded();
 
     alert("✅ هزینه با موفقیت ذخیره شد.");
 
