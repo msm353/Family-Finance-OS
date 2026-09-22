@@ -1,4 +1,5 @@
 import ExpenseForm from "../components/ExpenseForm";
+import ExpenseList from "../components/ExpenseList";
 
 export default function Home() {
   return (
@@ -24,6 +25,8 @@ export default function Home() {
 
       <ExpenseForm />
 
+      <ExpenseList />
+
       <hr
         style={{
           margin: "30px 0",
@@ -33,13 +36,6 @@ export default function Home() {
       <h2>هدف پروژه</h2>
 
       <p>سیستم مدیریت مالی خانوادگی کاملاً آفلاین</p>
-
-      <ul>
-        <li>✅ ثبت هزینه</li>
-        <li>🔄 گزارش‌ها (در حال توسعه)</li>
-        <li>🔄 بودجه‌بندی (در حال توسعه)</li>
-        <li>🔄 OCR فاکتور (نسخه‌های بعدی)</li>
-      </ul>
     </main>
   );
 }
