@@ -4,11 +4,13 @@ import { deleteExpense } from "../services/expenseService";
 type ExpenseListProps = {
   expenses: Expense[];
   onExpenseDeleted: () => void;
+  onExpenseEdit: (expense: Expense) => void;
 };
 
 export default function ExpenseList({
   expenses,
   onExpenseDeleted,
+  onExpenseEdit,
 }: ExpenseListProps) {
   async function handleDelete(id: number) {
     const ok = window.confirm(
@@ -57,12 +59,28 @@ export default function ExpenseList({
           </div>
 
           <div>
-            <strong>📅 تاریخ:</strong> {expense.date}
+            <strong>🏷 دسته‌بندی:</strong> {expense.category}
           </div>
 
           <div>
             <strong>💳 پرداخت:</strong> {expense.paymentMethod}
           </div>
+
+          <div>
+            <strong>📅 تاریخ:</strong> {expense.date}
+          </div>
+
+          <button
+            onClick={() => onExpenseEdit(expense)}
+            style={{
+              marginTop: "12px",
+              padding: "8px 12px",
+              cursor: "pointer",
+              marginLeft: "10px",
+            }}
+          >
+            ✏️ ویرایش
+          </button>
 
           <button
             onClick={() => {

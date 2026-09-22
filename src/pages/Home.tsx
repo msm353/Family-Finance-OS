@@ -8,6 +8,9 @@ import { getExpenses } from "../services/expenseService";
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [editingExpense, setEditingExpense] = useState<
+    Expense | undefined
+  >(undefined);
 
   async function loadExpenses() {
     const data = await getExpenses();
@@ -17,6 +20,15 @@ export default function Home() {
   useEffect(() => {
     loadExpenses();
   }, []);
+
+  function handleEdit(expense: Expense) {
+    setEditingExpense(expense);
+  }
+
+  function handleFinishedEditing() {
+    setEditingExpense(undefined);
+    loadExpenses();
+  }
 
   return (
     <main
@@ -41,11 +53,14 @@ export default function Home() {
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
+        editingExpense={editingExpense}
+        onFinishedEditing={handleFinishedEditing}
       />
 
       <ExpenseList
         expenses={expenses}
         onExpenseDeleted={loadExpenses}
+        onExpenseEdit={handleEdit}
       />
 
       <hr

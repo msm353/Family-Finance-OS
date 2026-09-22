@@ -1,23 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { addExpense } from "../services/expenseService";
+import {
+  addExpense,
+  updateExpense,
+} from "../services/expenseService";
+
 import { categories } from "../constants/categories";
 import { paymentMethods } from "../constants/paymentMethods";
 
+import type { Expense } from "../models/Expense";
+
 type ExpenseFormProps = {
   onExpenseAdded: () => void;
+  editingExpense?: Expense;
+  onFinishedEditing: () => void;
 };
 
 export default function ExpenseForm({
   onExpenseAdded,
+  editingExpense,
+  onFinishedEditing,
 }: ExpenseFormProps) {
   const [storeName, setStoreName] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState(categories[0]);
-  const [paymentMethod, setPaymentMethod] = useState(
-    paymentMethods[0]
-  );
+  const [paymentMethod, setPaymentMethod] =
+    useState(paymentMethods[0]);
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (editingExpense) {
+      setStoreName(editingExpense.storeName);
+      setAmount(String(editingExpense.amount));
+      setCategory(editingExpense.category);
+      setPaymentMethod(editingExpense.paymentMethod);
+      setDescription(editingExpense.description || "");
+    }
+  }, [editingExpense]);
+
+  function clearForm() {
+    setStoreName("");
+    setAmount("");
+    setCategory(categories[0]);
+    setPaymentMethod(paymentMethods[0]);
+    setDescription("");
+  }
 
   async function handleSubmit() {
     if (!storeName.trim()) {
@@ -30,36 +57,41 @@ export default function ExpenseForm({
       return;
     }
 
-    const ok = window.confirm(
-      `ثبت هزینه؟
-
-فروشگاه: ${storeName}
-
-مبلغ: ${Number(amount).toLocaleString("fa-IR")} تومان`
-    );
-
-    if (!ok) return;
-
-    await addExpense({
+    const expenseData = {
       storeName,
       amount: Number(amount),
       category,
       paymentMethod,
       description,
-      date: new Date().toLocaleDateString("fa-IR"),
-      createdAt: new Date().toISOString(),
+      date:
+        editingExpense?.date ??
+        new Date().toLocaleDateString("fa-IR"),
+      createdAt:
+        editingExpense?.createdAt ??
+        new Date().toISOString(),
       confirmed: true,
-    });
+    };
 
-    onExpenseAdded();
+    if (editingExpense) {
+      await updateExpense({
+        ...expenseData,
+        id: editingExpense.id,
+      });
+
+      alert("✅ هزینه ویرایش شد.");
+
+      clearForm();
+      onFinishedEditing();
+
+      return;
+    }
+
+    await addExpense(expenseData);
 
     alert("✅ هزینه ثبت شد.");
 
-    setStoreName("");
-    setAmount("");
-    setCategory(categories[0]);
-    setPaymentMethod(paymentMethods[0]);
-    setDescription("");
+    clearForm();
+    onExpenseAdded();
   }
 
   return (
@@ -71,34 +103,41 @@ export default function ExpenseForm({
         borderRadius: "8px",
       }}
     >
+      <h2>
+        {editingExpense
+          ? "✏️ ویرایش هزینه"
+          : "➕ ثبت هزینه جدید"}
+      </h2>
+
       <div style={{ marginBottom: "15px" }}>
         <label>نام فروشگاه</label>
 
         <input
-          type="text"
           value={storeName}
-          onChange={(e) => setStoreName(e.target.value)}
+          onChange={(e) =>
+            setStoreName(e.target.value)
+          }
           style={{
             width: "100%",
             padding: "10px",
             marginTop: "5px",
-            boxSizing: "border-box",
           }}
         />
       </div>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>مبلغ (تومان)</label>
+        <label>مبلغ</label>
 
         <input
           type="number"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) =>
+            setAmount(e.target.value)
+          }
           style={{
             width: "100%",
             padding: "10px",
             marginTop: "5px",
-            boxSizing: "border-box",
           }}
         />
       </div>
@@ -108,15 +147,16 @@ export default function ExpenseForm({
 
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) =>
+            setCategory(e.target.value)
+          }
           style={{
             width: "100%",
             padding: "10px",
-            marginTop: "5px",
           }}
         >
           {categories.map((item) => (
-            <option key={item} value={item}>
+            <option key={item}>
               {item}
             </option>
           ))}
@@ -128,15 +168,16 @@ export default function ExpenseForm({
 
         <select
           value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
+          onChange={(e) =>
+            setPaymentMethod(e.target.value)
+          }
           style={{
             width: "100%",
             padding: "10px",
-            marginTop: "5px",
           }}
         >
           {paymentMethods.map((item) => (
-            <option key={item} value={item}>
+            <option key={item}>
               {item}
             </option>
           ))}
@@ -148,13 +189,12 @@ export default function ExpenseForm({
 
         <textarea
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
+          onChange={(e) =>
+            setDescription(e.target.value)
+          }
           style={{
             width: "100%",
             padding: "10px",
-            marginTop: "5px",
-            boxSizing: "border-box",
           }}
         />
       </div>
@@ -167,8 +207,27 @@ export default function ExpenseForm({
           cursor: "pointer",
         }}
       >
-        ثبت هزینه
+        {editingExpense
+          ? "ذخیره تغییرات"
+          : "ثبت هزینه"}
       </button>
+
+      {editingExpense && (
+        <button
+          onClick={() => {
+            clearForm();
+            onFinishedEditing();
+          }}
+          style={{
+            width: "100%",
+            padding: "12px",
+            marginTop: "10px",
+            cursor: "pointer",
+          }}
+        >
+          انصراف
+        </button>
+      )}
     </div>
   );
 }
