@@ -1,5 +1,8 @@
 import { useState } from "react";
+
 import { addExpense } from "../services/expenseService";
+import { categories } from "../constants/categories";
+import { paymentMethods } from "../constants/paymentMethods";
 
 type ExpenseFormProps = {
   onExpenseAdded: () => void;
@@ -10,6 +13,11 @@ export default function ExpenseForm({
 }: ExpenseFormProps) {
   const [storeName, setStoreName] = useState("");
   const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState(categories[0]);
+  const [paymentMethod, setPaymentMethod] = useState(
+    paymentMethods[0]
+  );
+  const [description, setDescription] = useState("");
 
   async function handleSubmit() {
     if (!storeName.trim()) {
@@ -23,7 +31,7 @@ export default function ExpenseForm({
     }
 
     const ok = window.confirm(
-      `آیا این هزینه ثبت شود؟
+      `ثبت هزینه؟
 
 فروشگاه: ${storeName}
 
@@ -35,9 +43,9 @@ export default function ExpenseForm({
     await addExpense({
       storeName,
       amount: Number(amount),
-      category: "سایر",
-      paymentMethod: "کارت",
-      description: "",
+      category,
+      paymentMethod,
+      description,
       date: new Date().toLocaleDateString("fa-IR"),
       createdAt: new Date().toISOString(),
       confirmed: true,
@@ -45,10 +53,13 @@ export default function ExpenseForm({
 
     onExpenseAdded();
 
-    alert("✅ هزینه با موفقیت ذخیره شد.");
+    alert("✅ هزینه ثبت شد.");
 
     setStoreName("");
     setAmount("");
+    setCategory(categories[0]);
+    setPaymentMethod(paymentMethods[0]);
+    setDescription("");
   }
 
   return (
@@ -67,7 +78,6 @@ export default function ExpenseForm({
           type="text"
           value={storeName}
           onChange={(e) => setStoreName(e.target.value)}
-          placeholder="مثلاً رفاه"
           style={{
             width: "100%",
             padding: "10px",
@@ -84,7 +94,62 @@ export default function ExpenseForm({
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          placeholder="350000"
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "5px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <label>دسته‌بندی</label>
+
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "5px",
+          }}
+        >
+          {categories.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <label>روش پرداخت</label>
+
+        <select
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "5px",
+          }}
+        >
+          {paymentMethods.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <label>توضیحات</label>
+
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
           style={{
             width: "100%",
             padding: "10px",

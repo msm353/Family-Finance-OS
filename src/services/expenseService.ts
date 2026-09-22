@@ -10,6 +10,15 @@ export async function addExpense(expense: Expense) {
   }
 }
 
+export async function updateExpense(expense: Expense) {
+  try {
+    return await db.expenses.put(expense);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export async function getExpenses() {
   return db.expenses.orderBy("id").reverse().toArray();
 }
