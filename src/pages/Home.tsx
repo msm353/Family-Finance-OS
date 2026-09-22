@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseList from "../components/ExpenseList";
+import ExpenseSummary from "../components/ExpenseSummary";
 
 import type { Expense } from "../models/Expense";
 import { getExpenses } from "../services/expenseService";
@@ -50,6 +51,8 @@ export default function Home() {
       >
         نسخه آزمایشی 0.1.0
       </p>
+
+      <ExpenseSummary expenses={expenses} />
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
