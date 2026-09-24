@@ -16,6 +16,19 @@ type ExpenseFormProps = {
   onFinishedEditing: () => void;
 };
 
+function getTodayDate() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(
+    2,
+    "0"
+  );
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function ExpenseForm({
   onExpenseAdded,
   editingExpense,
@@ -24,9 +37,13 @@ export default function ExpenseForm({
   const [storeName, setStoreName] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState(categories[0]);
+
   const [paymentMethod, setPaymentMethod] =
     useState(paymentMethods[0]);
+
   const [description, setDescription] = useState("");
+
+  const [date, setDate] = useState(getTodayDate());
 
   useEffect(() => {
     if (editingExpense) {
@@ -35,6 +52,16 @@ export default function ExpenseForm({
       setCategory(editingExpense.category);
       setPaymentMethod(editingExpense.paymentMethod);
       setDescription(editingExpense.description || "");
+
+      if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+          editingExpense.date
+        )
+      ) {
+        setDate(editingExpense.date);
+      } else {
+        setDate(getTodayDate());
+      }
     }
   }, [editingExpense]);
 
@@ -44,6 +71,7 @@ export default function ExpenseForm({
     setCategory(categories[0]);
     setPaymentMethod(paymentMethods[0]);
     setDescription("");
+    setDate(getTodayDate());
   }
 
   async function handleSubmit() {
@@ -57,15 +85,28 @@ export default function ExpenseForm({
       return;
     }
 
+    const numericAmount = Number(amount);
+
+    if (
+      !Number.isFinite(numericAmount) ||
+      numericAmount <= 0
+    ) {
+      alert("مبلغ معتبر وارد کنید.");
+      return;
+    }
+
+    if (!date) {
+      alert("تاریخ را انتخاب کنید.");
+      return;
+    }
+
     const expenseData = {
-      storeName,
-      amount: Number(amount),
+      storeName: storeName.trim(),
+      amount: numericAmount,
       category,
       paymentMethod,
-      description,
-      date:
-        editingExpense?.date ??
-        new Date().toLocaleDateString("fa-IR"),
+      description: description.trim(),
+      date,
       createdAt:
         editingExpense?.createdAt ??
         new Date().toISOString(),
@@ -110,9 +151,12 @@ export default function ExpenseForm({
       </h2>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>نام فروشگاه</label>
+        <label htmlFor="store-name">
+          نام فروشگاه
+        </label>
 
         <input
+          id="store-name"
           value={storeName}
           onChange={(e) =>
             setStoreName(e.target.value)
@@ -121,15 +165,20 @@ export default function ExpenseForm({
             width: "100%",
             padding: "10px",
             marginTop: "5px",
+            boxSizing: "border-box",
           }}
         />
       </div>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>مبلغ</label>
+        <label htmlFor="expense-amount">
+          مبلغ
+        </label>
 
         <input
+          id="expense-amount"
           type="number"
+          min="0"
           value={amount}
           onChange={(e) =>
             setAmount(e.target.value)
@@ -138,14 +187,39 @@ export default function ExpenseForm({
             width: "100%",
             padding: "10px",
             marginTop: "5px",
+            boxSizing: "border-box",
           }}
         />
       </div>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>دسته‌بندی</label>
+        <label htmlFor="expense-date">
+          📅 تاریخ هزینه
+        </label>
+
+        <input
+          id="expense-date"
+          type="date"
+          value={date}
+          onChange={(e) =>
+            setDate(e.target.value)
+          }
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginTop: "5px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <label htmlFor="expense-category">
+          دسته‌بندی
+        </label>
 
         <select
+          id="expense-category"
           value={category}
           onChange={(e) =>
             setCategory(e.target.value)
@@ -153,10 +227,15 @@ export default function ExpenseForm({
           style={{
             width: "100%",
             padding: "10px",
+            marginTop: "5px",
+            boxSizing: "border-box",
           }}
         >
           {categories.map((item) => (
-            <option key={item}>
+            <option
+              key={item}
+              value={item}
+            >
               {item}
             </option>
           ))}
@@ -164,9 +243,12 @@ export default function ExpenseForm({
       </div>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>روش پرداخت</label>
+        <label htmlFor="payment-method">
+          روش پرداخت
+        </label>
 
         <select
+          id="payment-method"
           value={paymentMethod}
           onChange={(e) =>
             setPaymentMethod(e.target.value)
@@ -174,10 +256,15 @@ export default function ExpenseForm({
           style={{
             width: "100%",
             padding: "10px",
+            marginTop: "5px",
+            boxSizing: "border-box",
           }}
         >
           {paymentMethods.map((item) => (
-            <option key={item}>
+            <option
+              key={item}
+              value={item}
+            >
               {item}
             </option>
           ))}
@@ -185,9 +272,12 @@ export default function ExpenseForm({
       </div>
 
       <div style={{ marginBottom: "15px" }}>
-        <label>توضیحات</label>
+        <label htmlFor="expense-description">
+          توضیحات
+        </label>
 
         <textarea
+          id="expense-description"
           value={description}
           onChange={(e) =>
             setDescription(e.target.value)
@@ -195,6 +285,8 @@ export default function ExpenseForm({
           style={{
             width: "100%",
             padding: "10px",
+            marginTop: "5px",
+            boxSizing: "border-box",
           }}
         />
       </div>
