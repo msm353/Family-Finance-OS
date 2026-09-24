@@ -60,6 +60,9 @@ export default function Home() {
   const [sortOption, setSortOption] =
     useState<SortOption>("newest");
 
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   async function loadExpenses() {
     const data = await getExpenses();
     setExpenses(data);
@@ -80,6 +83,15 @@ export default function Home() {
 
   function handleSearch(value: string) {
     setSearchText(value);
+  }
+
+  function clearFilters() {
+    setSearchText("");
+    setSelectedCategory("همه");
+    setSelectedPaymentMethod("همه");
+    setFromDate("");
+    setToDate("");
+    setSortOption("newest");
   }
 
   const normalizedSearchText = searchText
@@ -111,10 +123,25 @@ export default function Home() {
         selectedPaymentMethod === "همه" ||
         expense.paymentMethod === selectedPaymentMethod;
 
+      const expenseHasDate =
+        hasSortableDate(expense.date);
+
+      const matchesFromDate =
+        !fromDate ||
+        (expenseHasDate &&
+          expense.date >= fromDate);
+
+      const matchesToDate =
+        !toDate ||
+        (expenseHasDate &&
+          expense.date <= toDate);
+
       return (
         matchesSearch &&
         matchesCategory &&
-        matchesPaymentMethod
+        matchesPaymentMethod &&
+        matchesFromDate &&
+        matchesToDate
       );
     }
   );
@@ -169,7 +196,7 @@ export default function Home() {
           gridTemplateColumns:
             "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "12px",
-          marginBottom: "20px",
+          marginBottom: "12px",
         }}
       >
         <div>
@@ -300,6 +327,88 @@ export default function Home() {
           </select>
         </div>
       </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: "12px",
+          marginBottom: "12px",
+        }}
+      >
+        <div>
+          <label
+            htmlFor="from-date"
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              fontWeight: "bold",
+            }}
+          >
+            📅 از تاریخ
+          </label>
+
+          <input
+            id="from-date"
+            type="date"
+            value={fromDate}
+            onChange={(e) =>
+              setFromDate(e.target.value)
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              boxSizing: "border-box",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+            }}
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="to-date"
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              fontWeight: "bold",
+            }}
+          >
+            📅 تا تاریخ
+          </label>
+
+          <input
+            id="to-date"
+            type="date"
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(e) =>
+              setToDate(e.target.value)
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              boxSizing: "border-box",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+            }}
+          />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={clearFilters}
+        style={{
+          width: "100%",
+          padding: "10px",
+          marginBottom: "20px",
+          cursor: "pointer",
+        }}
+      >
+        ↩️ پاک کردن فیلترها
+      </button>
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
