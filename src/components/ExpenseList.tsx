@@ -7,6 +7,30 @@ type ExpenseListProps = {
   onExpenseEdit: (expense: Expense) => void;
 };
 
+function formatExpenseDate(date: string) {
+  const match = date.match(
+    /^(\d{4})-(\d{2})-(\d{2})$/
+  );
+
+  if (!match) {
+    return date;
+  }
+
+  const [, year, month, day] = match;
+
+  const parsedDate = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day)
+  );
+
+  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(parsedDate);
+}
+
 export default function ExpenseList({
   expenses,
   onExpenseDeleted,
@@ -38,7 +62,10 @@ export default function ExpenseList({
         }}
       >
         <h2>هزینه‌های ثبت‌شده</h2>
-        <p>هیچ هزینه‌ای برای نمایش وجود ندارد.</p>
+
+        <p>
+          هیچ هزینه‌ای برای نمایش وجود ندارد.
+        </p>
       </div>
     );
   }
@@ -66,12 +93,17 @@ export default function ExpenseList({
               marginBottom: "12px",
             }}
           >
-            <strong style={{ fontSize: "18px" }}>
+            <strong
+              style={{
+                fontSize: "18px",
+              }}
+            >
               🏪 {expense.storeName}
             </strong>
 
             <strong>
-              {expense.amount.toLocaleString("fa-IR")} تومان
+              {expense.amount.toLocaleString("fa-IR")}{" "}
+              تومان
             </strong>
           </div>
 
@@ -87,7 +119,7 @@ export default function ExpenseList({
 
           <div style={{ marginBottom: "6px" }}>
             <strong>📅 تاریخ:</strong>{" "}
-            {expense.date}
+            {formatExpenseDate(expense.date)}
           </div>
 
           {expense.description?.trim() && (
@@ -112,7 +144,10 @@ export default function ExpenseList({
             }}
           >
             <button
-              onClick={() => onExpenseEdit(expense)}
+              type="button"
+              onClick={() =>
+                onExpenseEdit(expense)
+              }
               style={{
                 padding: "8px 14px",
                 cursor: "pointer",
@@ -122,6 +157,7 @@ export default function ExpenseList({
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 if (expense.id !== undefined) {
                   handleDelete(expense.id);
