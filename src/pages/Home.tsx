@@ -11,6 +11,8 @@ import { paymentMethods } from "../constants/paymentMethods";
 import type { Expense } from "../models/Expense";
 import { getExpenses } from "../services/expenseService";
 
+import { exportExpensesToCsv } from "../utils/exportExpensesToCsv";
+
 type SortOption =
   | "newest"
   | "oldest"
@@ -58,12 +60,14 @@ function compareExpenseDates(
 }
 
 export default function Home() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] =
+    useState<Expense[]>([]);
 
   const [editingExpense, setEditingExpense] =
     useState<Expense | undefined>(undefined);
 
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] =
+    useState("");
 
   const [selectedCategory, setSelectedCategory] =
     useState("همه");
@@ -76,8 +80,11 @@ export default function Home() {
   const [sortOption, setSortOption] =
     useState<SortOption>("newest");
 
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] =
+    useState("");
+
+  const [toDate, setToDate] =
+    useState("");
 
   async function loadExpenses() {
     const data = await getExpenses();
@@ -114,12 +121,18 @@ export default function Home() {
       startDate.getDate() - (days - 1)
     );
 
-    setFromDate(formatLocalDate(startDate));
-    setToDate(formatLocalDate(today));
+    setFromDate(
+      formatLocalDate(startDate)
+    );
+
+    setToDate(
+      formatLocalDate(today)
+    );
   }
 
   function filterToday() {
-    const today = formatLocalDate(new Date());
+    const today =
+      formatLocalDate(new Date());
 
     setFromDate(today);
     setToDate(today);
@@ -134,33 +147,42 @@ export default function Home() {
     setSortOption("newest");
   }
 
-  const normalizedSearchText = searchText
-    .trim()
-    .toLowerCase();
+  const normalizedSearchText =
+    searchText.trim().toLowerCase();
 
-  const filteredExpenses = expenses.filter(
-    (expense) => {
+  const filteredExpenses =
+    expenses.filter((expense) => {
       const matchesSearch =
         !normalizedSearchText ||
         expense.storeName
           .toLowerCase()
-          .includes(normalizedSearchText) ||
+          .includes(
+            normalizedSearchText
+          ) ||
         expense.category
           .toLowerCase()
-          .includes(normalizedSearchText) ||
+          .includes(
+            normalizedSearchText
+          ) ||
         expense.paymentMethod
           .toLowerCase()
-          .includes(normalizedSearchText) ||
+          .includes(
+            normalizedSearchText
+          ) ||
         (expense.description ?? "")
           .toLowerCase()
-          .includes(normalizedSearchText);
+          .includes(
+            normalizedSearchText
+          );
 
       const matchesCategory =
         selectedCategory === "همه" ||
-        expense.category === selectedCategory;
+        expense.category ===
+          selectedCategory;
 
       const matchesPaymentMethod =
-        selectedPaymentMethod === "همه" ||
+        selectedPaymentMethod ===
+          "همه" ||
         expense.paymentMethod ===
           selectedPaymentMethod;
 
@@ -184,15 +206,17 @@ export default function Home() {
         matchesFromDate &&
         matchesToDate
       );
-    }
-  );
+    });
 
   const sortedExpenses = [
     ...filteredExpenses,
   ].sort((a, b) => {
     switch (sortOption) {
       case "oldest":
-        return compareExpenseDates(a, b);
+        return compareExpenseDates(
+          a,
+          b
+        );
 
       case "highest":
         return b.amount - a.amount;
@@ -202,7 +226,10 @@ export default function Home() {
 
       case "newest":
       default:
-        return compareExpenseDates(b, a);
+        return compareExpenseDates(
+          b,
+          a
+        );
     }
   });
 
@@ -231,7 +258,9 @@ export default function Home() {
         expenses={filteredExpenses}
       />
 
-      <ExpenseSearch onSearch={handleSearch} />
+      <ExpenseSearch
+        onSearch={handleSearch}
+      />
 
       <div
         style={{
@@ -274,14 +303,16 @@ export default function Home() {
               همه دسته‌بندی‌ها
             </option>
 
-            {categories.map((category) => (
-              <option
-                key={category}
-                value={category}
-              >
-                {category}
-              </option>
-            ))}
+            {categories.map(
+              (category) => (
+                <option
+                  key={category}
+                  value={category}
+                >
+                  {category}
+                </option>
+              )
+            )}
           </select>
         </div>
 
@@ -299,7 +330,9 @@ export default function Home() {
 
           <select
             id="payment-filter"
-            value={selectedPaymentMethod}
+            value={
+              selectedPaymentMethod
+            }
             onChange={(e) =>
               setSelectedPaymentMethod(
                 e.target.value
@@ -317,14 +350,16 @@ export default function Home() {
               همه روش‌های پرداخت
             </option>
 
-            {paymentMethods.map((method) => (
-              <option
-                key={method}
-                value={method}
-              >
-                {method}
-              </option>
-            ))}
+            {paymentMethods.map(
+              (method) => (
+                <option
+                  key={method}
+                  value={method}
+                >
+                  {method}
+                </option>
+              )
+            )}
           </select>
         </div>
 
@@ -345,7 +380,8 @@ export default function Home() {
             value={sortOption}
             onChange={(e) =>
               setSortOption(
-                e.target.value as SortOption
+                e.target
+                  .value as SortOption
               )
             }
             style={{
@@ -447,7 +483,9 @@ export default function Home() {
             type="date"
             value={fromDate}
             onChange={(e) =>
-              setFromDate(e.target.value)
+              setFromDate(
+                e.target.value
+              )
             }
             style={{
               width: "100%",
@@ -475,9 +513,13 @@ export default function Home() {
             id="to-date"
             type="date"
             value={toDate}
-            min={fromDate || undefined}
+            min={
+              fromDate || undefined
+            }
             onChange={(e) =>
-              setToDate(e.target.value)
+              setToDate(
+                e.target.value
+              )
             }
             style={{
               width: "100%",
@@ -490,22 +532,47 @@ export default function Home() {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={clearFilters}
+      <div
         style={{
-          width: "100%",
-          padding: "10px",
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: "10px",
           marginBottom: "20px",
-          cursor: "pointer",
         }}
       >
-        ↩️ پاک کردن فیلترها
-      </button>
+        <button
+          type="button"
+          onClick={clearFilters}
+          style={{
+            padding: "10px",
+            cursor: "pointer",
+          }}
+        >
+          ↩️ پاک کردن فیلترها
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            exportExpensesToCsv(
+              sortedExpenses
+            )
+          }
+          style={{
+            padding: "10px",
+            cursor: "pointer",
+          }}
+        >
+          📤 خروجی CSV
+        </button>
+      </div>
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
-        editingExpense={editingExpense}
+        editingExpense={
+          editingExpense
+        }
         onFinishedEditing={
           handleFinishedEditing
         }
@@ -513,7 +580,9 @@ export default function Home() {
 
       <ExpenseList
         expenses={sortedExpenses}
-        onExpenseDeleted={loadExpenses}
+        onExpenseDeleted={
+          loadExpenses
+        }
         onExpenseEdit={handleEdit}
       />
 
@@ -526,7 +595,8 @@ export default function Home() {
       <h2>هدف پروژه</h2>
 
       <p>
-        سیستم مدیریت مالی خانوادگی کاملاً آفلاین
+        سیستم مدیریت مالی خانوادگی
+        کاملاً آفلاین
       </p>
     </main>
   );
