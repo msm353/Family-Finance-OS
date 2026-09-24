@@ -18,6 +18,20 @@ export default function ExpenseSummary({
     0
   );
 
+  const averageAmount =
+    expenses.length > 0
+      ? totalAmount / expenses.length
+      : 0;
+
+  const highestExpense =
+    expenses.length > 0
+      ? Math.max(
+          ...expenses.map(
+            (expense) => expense.amount
+          )
+        )
+      : 0;
+
   const categoryMap = new Map<
     string,
     CategorySummary
@@ -59,7 +73,7 @@ export default function ExpenseSummary({
         style={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
+            "repeat(auto-fit, minmax(150px, 1fr))",
           gap: "12px",
           marginBottom:
             categorySummary.length > 0
@@ -115,7 +129,65 @@ export default function ExpenseSummary({
               fontSize: "20px",
             }}
           >
-            {totalAmount.toLocaleString("fa-IR")}{" "}
+            {totalAmount.toLocaleString(
+              "fa-IR"
+            )}{" "}
+            تومان
+          </strong>
+        </div>
+
+        <div
+          style={{
+            padding: "12px",
+            border: "1px solid #eee",
+            borderRadius: "8px",
+          }}
+        >
+          <div
+            style={{
+              color: "#666",
+              marginBottom: "6px",
+            }}
+          >
+            میانگین هر هزینه
+          </div>
+
+          <strong
+            style={{
+              fontSize: "20px",
+            }}
+          >
+            {Math.round(
+              averageAmount
+            ).toLocaleString("fa-IR")}{" "}
+            تومان
+          </strong>
+        </div>
+
+        <div
+          style={{
+            padding: "12px",
+            border: "1px solid #eee",
+            borderRadius: "8px",
+          }}
+        >
+          <div
+            style={{
+              color: "#666",
+              marginBottom: "6px",
+            }}
+          >
+            بیشترین هزینه
+          </div>
+
+          <strong
+            style={{
+              fontSize: "20px",
+            }}
+          >
+            {highestExpense.toLocaleString(
+              "fa-IR"
+            )}{" "}
             تومان
           </strong>
         </div>
