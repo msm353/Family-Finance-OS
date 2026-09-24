@@ -21,6 +21,20 @@ function hasSortableDate(date: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
 }
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+
+  const month = String(
+    date.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    date.getDate()
+  ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function compareExpenseDates(
   a: Expense,
   b: Expense
@@ -54,8 +68,10 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] =
     useState("همه");
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState("همه");
+  const [
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+  ] = useState("همه");
 
   const [sortOption, setSortOption] =
     useState<SortOption>("newest");
@@ -83,6 +99,30 @@ export default function Home() {
 
   function handleSearch(value: string) {
     setSearchText(value);
+  }
+
+  function setQuickDateRange(days: number) {
+    const today = new Date();
+
+    const startDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+    startDate.setDate(
+      startDate.getDate() - (days - 1)
+    );
+
+    setFromDate(formatLocalDate(startDate));
+    setToDate(formatLocalDate(today));
+  }
+
+  function filterToday() {
+    const today = formatLocalDate(new Date());
+
+    setFromDate(today);
+    setToDate(today);
   }
 
   function clearFilters() {
@@ -121,7 +161,8 @@ export default function Home() {
 
       const matchesPaymentMethod =
         selectedPaymentMethod === "همه" ||
-        expense.paymentMethod === selectedPaymentMethod;
+        expense.paymentMethod ===
+          selectedPaymentMethod;
 
       const expenseHasDate =
         hasSortableDate(expense.date);
@@ -146,24 +187,24 @@ export default function Home() {
     }
   );
 
-  const sortedExpenses = [...filteredExpenses].sort(
-    (a, b) => {
-      switch (sortOption) {
-        case "oldest":
-          return compareExpenseDates(a, b);
+  const sortedExpenses = [
+    ...filteredExpenses,
+  ].sort((a, b) => {
+    switch (sortOption) {
+      case "oldest":
+        return compareExpenseDates(a, b);
 
-        case "highest":
-          return b.amount - a.amount;
+      case "highest":
+        return b.amount - a.amount;
 
-        case "lowest":
-          return a.amount - b.amount;
+      case "lowest":
+        return a.amount - b.amount;
 
-        case "newest":
-        default:
-          return compareExpenseDates(b, a);
-      }
+      case "newest":
+      default:
+        return compareExpenseDates(b, a);
     }
-  );
+  });
 
   return (
     <main
@@ -186,7 +227,9 @@ export default function Home() {
         نسخه آزمایشی 0.1.0
       </p>
 
-      <ExpenseSummary expenses={filteredExpenses} />
+      <ExpenseSummary
+        expenses={filteredExpenses}
+      />
 
       <ExpenseSearch onSearch={handleSearch} />
 
@@ -215,7 +258,9 @@ export default function Home() {
             id="category-filter"
             value={selectedCategory}
             onChange={(e) =>
-              setSelectedCategory(e.target.value)
+              setSelectedCategory(
+                e.target.value
+              )
             }
             style={{
               width: "100%",
@@ -256,7 +301,9 @@ export default function Home() {
             id="payment-filter"
             value={selectedPaymentMethod}
             onChange={(e) =>
-              setSelectedPaymentMethod(e.target.value)
+              setSelectedPaymentMethod(
+                e.target.value
+              )
             }
             style={{
               width: "100%",
@@ -326,6 +373,52 @@ export default function Home() {
             </option>
           </select>
         </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "8px",
+          marginBottom: "12px",
+        }}
+      >
+        <button
+          type="button"
+          onClick={filterToday}
+          style={{
+            padding: "10px 14px",
+            cursor: "pointer",
+          }}
+        >
+          امروز
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setQuickDateRange(7)
+          }
+          style={{
+            padding: "10px 14px",
+            cursor: "pointer",
+          }}
+        >
+          ۷ روز اخیر
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setQuickDateRange(30)
+          }
+          style={{
+            padding: "10px 14px",
+            cursor: "pointer",
+          }}
+        >
+          ۳۰ روز اخیر
+        </button>
       </div>
 
       <div
@@ -413,7 +506,9 @@ export default function Home() {
       <ExpenseForm
         onExpenseAdded={loadExpenses}
         editingExpense={editingExpense}
-        onFinishedEditing={handleFinishedEditing}
+        onFinishedEditing={
+          handleFinishedEditing
+        }
       />
 
       <ExpenseList
