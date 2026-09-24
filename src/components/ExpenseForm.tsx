@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { Calendar } from "./ui/calendar";
+
 import {
   addExpense,
   updateExpense,
@@ -7,6 +9,8 @@ import {
 
 import { categories } from "../constants/categories";
 import { paymentMethods } from "../constants/paymentMethods";
+
+import { formatJalaliNumeric } from "../lib/jalali";
 
 import type { Expense } from "../models/Expense";
 
@@ -17,19 +21,39 @@ type ExpenseFormProps = {
 };
 
 function getTodayDate() {
-  const now = new Date();
+  return formatDateForStorage(new Date());
+}
 
-  const year = now.getFullYear();
+function formatDateForStorage(date: Date) {
+  const year = date.getFullYear();
 
   const month = String(
-    now.getMonth() + 1
+    date.getMonth() + 1
   ).padStart(2, "0");
 
   const day = String(
-    now.getDate()
+    date.getDate()
   ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function parseStoredDate(value: string) {
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})$/
+  );
+
+  if (!match) {
+    return new Date();
+  }
+
+  const [, year, month, day] = match;
+
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day)
+  );
 }
 
 function formatAmountInput(value: string) {
@@ -80,6 +104,11 @@ export default function ExpenseForm({
   const [date, setDate] =
     useState(getTodayDate());
 
+  const [
+    isCalendarOpen,
+    setIsCalendarOpen,
+  ] = useState(false);
+
   useEffect(() => {
     if (editingExpense) {
       setStoreName(
@@ -115,6 +144,8 @@ export default function ExpenseForm({
       } else {
         setDate(getTodayDate());
       }
+
+      setIsCalendarOpen(false);
     }
   }, [editingExpense]);
 
@@ -129,6 +160,7 @@ export default function ExpenseForm({
 
     setDescription("");
     setDate(getTodayDate());
+    setIsCalendarOpen(false);
   }
 
   function handleAmountChange(
@@ -140,6 +172,18 @@ export default function ExpenseForm({
       );
 
     setAmount(formattedValue);
+  }
+
+  function handleDateChange(
+    selectedDate: Date
+  ) {
+    setDate(
+      formatDateForStorage(
+        selectedDate
+      )
+    );
+
+    setIsCalendarOpen(false);
   }
 
   async function handleSubmit() {
@@ -231,6 +275,9 @@ export default function ExpenseForm({
     onExpenseAdded();
   }
 
+  const selectedDate =
+    parseStoredDate(date);
+
   return (
     <div
       style={{
@@ -270,6 +317,9 @@ export default function ExpenseForm({
             marginTop: "5px",
             boxSizing:
               "border-box",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
           }}
         />
       </div>
@@ -300,6 +350,9 @@ export default function ExpenseForm({
               "border-box",
             direction: "ltr",
             textAlign: "right",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
           }}
         />
       </div>
@@ -309,17 +362,15 @@ export default function ExpenseForm({
           marginBottom: "15px",
         }}
       >
-        <label htmlFor="expense-date">
+        <label>
           📅 تاریخ هزینه
         </label>
 
-        <input
-          id="expense-date"
-          type="date"
-          value={date}
-          onChange={(e) =>
-            setDate(
-              e.target.value
+        <button
+          type="button"
+          onClick={() =>
+            setIsCalendarOpen(
+              (current) => !current
             )
           }
           style={{
@@ -328,8 +379,33 @@ export default function ExpenseForm({
             marginTop: "5px",
             boxSizing:
               "border-box",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
+            background: "transparent",
+            cursor: "pointer",
+            textAlign: "right",
           }}
-        />
+        >
+          {formatJalaliNumeric(
+            selectedDate
+          )}
+        </button>
+
+        {isCalendarOpen && (
+          <div
+            style={{
+              marginTop: "8px",
+            }}
+          >
+            <Calendar
+              value={selectedDate}
+              onChange={
+                handleDateChange
+              }
+            />
+          </div>
+        )}
       </div>
 
       <div
@@ -355,6 +431,9 @@ export default function ExpenseForm({
             marginTop: "5px",
             boxSizing:
               "border-box",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
           }}
         >
           {categories.map(
@@ -393,6 +472,9 @@ export default function ExpenseForm({
             marginTop: "5px",
             boxSizing:
               "border-box",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
           }}
         >
           {paymentMethods.map(
@@ -431,6 +513,9 @@ export default function ExpenseForm({
             marginTop: "5px",
             boxSizing:
               "border-box",
+            border:
+              "1px solid #ddd",
+            borderRadius: "6px",
           }}
         />
       </div>
