@@ -17,6 +17,32 @@ type SortOption =
   | "highest"
   | "lowest";
 
+function hasSortableDate(date: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date);
+}
+
+function compareExpenseDates(
+  a: Expense,
+  b: Expense
+) {
+  const aHasDate = hasSortableDate(a.date);
+  const bHasDate = hasSortableDate(b.date);
+
+  if (aHasDate && bHasDate) {
+    return a.date.localeCompare(b.date);
+  }
+
+  if (aHasDate && !bHasDate) {
+    return 1;
+  }
+
+  if (!aHasDate && bHasDate) {
+    return -1;
+  }
+
+  return (a.id ?? 0) - (b.id ?? 0);
+}
+
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
@@ -24,10 +50,13 @@ export default function Home() {
     useState<Expense | undefined>(undefined);
 
   const [searchText, setSearchText] = useState("");
+
   const [selectedCategory, setSelectedCategory] =
     useState("همه");
+
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState("همه");
+
   const [sortOption, setSortOption] =
     useState<SortOption>("newest");
 
@@ -94,7 +123,7 @@ export default function Home() {
     (a, b) => {
       switch (sortOption) {
         case "oldest":
-          return (a.id ?? 0) - (b.id ?? 0);
+          return compareExpenseDates(a, b);
 
         case "highest":
           return b.amount - a.amount;
@@ -104,7 +133,7 @@ export default function Home() {
 
         case "newest":
         default:
-          return (b.id ?? 0) - (a.id ?? 0);
+          return compareExpenseDates(b, a);
       }
     }
   );
@@ -254,11 +283,11 @@ export default function Home() {
             }}
           >
             <option value="newest">
-              جدیدترین
+              جدیدترین تاریخ
             </option>
 
             <option value="oldest">
-              قدیمی‌ترین
+              قدیمی‌ترین تاریخ
             </option>
 
             <option value="highest">
