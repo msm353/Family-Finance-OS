@@ -1,21 +1,16 @@
-import { useState } from "react";
-
 type ExpenseSearchProps = {
+  value: string;
   onSearch: (value: string) => void;
 };
 
 export default function ExpenseSearch({
+  value,
   onSearch,
 }: ExpenseSearchProps) {
-  const [value, setValue] = useState("");
-
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
-    const text = e.target.value;
-
-    setValue(text);
-    onSearch(text);
+    onSearch(e.target.value);
   }
 
   return (

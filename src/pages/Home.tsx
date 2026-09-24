@@ -69,8 +69,10 @@ export default function Home() {
   const [searchText, setSearchText] =
     useState("");
 
-  const [selectedCategory, setSelectedCategory] =
-    useState("همه");
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("همه");
 
   const [
     selectedPaymentMethod,
@@ -156,24 +158,16 @@ export default function Home() {
         !normalizedSearchText ||
         expense.storeName
           .toLowerCase()
-          .includes(
-            normalizedSearchText
-          ) ||
+          .includes(normalizedSearchText) ||
         expense.category
           .toLowerCase()
-          .includes(
-            normalizedSearchText
-          ) ||
+          .includes(normalizedSearchText) ||
         expense.paymentMethod
           .toLowerCase()
-          .includes(
-            normalizedSearchText
-          ) ||
+          .includes(normalizedSearchText) ||
         (expense.description ?? "")
           .toLowerCase()
-          .includes(
-            normalizedSearchText
-          );
+          .includes(normalizedSearchText);
 
       const matchesCategory =
         selectedCategory === "همه" ||
@@ -181,8 +175,7 @@ export default function Home() {
           selectedCategory;
 
       const matchesPaymentMethod =
-        selectedPaymentMethod ===
-          "همه" ||
+        selectedPaymentMethod === "همه" ||
         expense.paymentMethod ===
           selectedPaymentMethod;
 
@@ -213,10 +206,7 @@ export default function Home() {
   ].sort((a, b) => {
     switch (sortOption) {
       case "oldest":
-        return compareExpenseDates(
-          a,
-          b
-        );
+        return compareExpenseDates(a, b);
 
       case "highest":
         return b.amount - a.amount;
@@ -226,10 +216,7 @@ export default function Home() {
 
       case "newest":
       default:
-        return compareExpenseDates(
-          b,
-          a
-        );
+        return compareExpenseDates(b, a);
     }
   });
 
@@ -259,6 +246,7 @@ export default function Home() {
       />
 
       <ExpenseSearch
+        value={searchText}
         onSearch={handleSearch}
       />
 
@@ -483,9 +471,7 @@ export default function Home() {
             type="date"
             value={fromDate}
             onChange={(e) =>
-              setFromDate(
-                e.target.value
-              )
+              setFromDate(e.target.value)
             }
             style={{
               width: "100%",
@@ -513,13 +499,9 @@ export default function Home() {
             id="to-date"
             type="date"
             value={toDate}
-            min={
-              fromDate || undefined
-            }
+            min={fromDate || undefined}
             onChange={(e) =>
-              setToDate(
-                e.target.value
-              )
+              setToDate(e.target.value)
             }
             style={{
               width: "100%",
@@ -570,9 +552,7 @@ export default function Home() {
 
       <ExpenseForm
         onExpenseAdded={loadExpenses}
-        editingExpense={
-          editingExpense
-        }
+        editingExpense={editingExpense}
         onFinishedEditing={
           handleFinishedEditing
         }
@@ -580,9 +560,7 @@ export default function Home() {
 
       <ExpenseList
         expenses={sortedExpenses}
-        onExpenseDeleted={
-          loadExpenses
-        }
+        onExpenseDeleted={loadExpenses}
         onExpenseEdit={handleEdit}
       />
 
@@ -595,8 +573,7 @@ export default function Home() {
       <h2>هدف پروژه</h2>
 
       <p>
-        سیستم مدیریت مالی خانوادگی
-        کاملاً آفلاین
+        سیستم مدیریت مالی خانوادگی کاملاً آفلاین
       </p>
     </main>
   );
