@@ -1,4 +1,8 @@
 import { useRef, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import { clearExpenses } from "../services/expenseService";
 import {
   createExpenseBackup,
   parseExpenseBackup,
@@ -23,6 +27,22 @@ export default function ExpenseBackup({ currentCount, onRestored }: Props) {
     setMessage("");
     try {
       const backup = await createExpenseBackup();
+      if (Capacitor.isNativePlatform()) {
+        const path = `ffos-backup-${backup.exportedAt.replace(/[:.]/g, "-")}.json`;
+        const file = await Filesystem.writeFile({
+          path,
+          data: JSON.stringify(backup, null, 2),
+          directory: Directory.Cache,
+          encoding: Encoding.UTF8,
+        });
+        await Share.share({
+          title: "فایل پشتیبان FFOS",
+          url: file.uri,
+          dialogTitle: "ذخیره یا اشتراک فایل پشتیبان",
+        });
+        setMessage("فایل پشتیبان آماده شد. ذخیره‌شدن آن را در برنامهٔ انتخابی بررسی کنید.");
+        return;
+      }
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -86,6 +106,29 @@ export default function ExpenseBackup({ currentCount, onRestored }: Props) {
     }
   }
 
+  async function deleteAllData() {
+    if (busy || currentCount === 0) return;
+    const confirmed = window.confirm(
+      `همهٔ ${currentCount} هزینهٔ ذخیره‌شده روی این دستگاه برای همیشه پاک می‌شوند. اگر می‌خواهید بعداً آن‌ها را برگردانید، ابتدا فایل پشتیبان JSON بگیرید. ادامه می‌دهید؟`
+    );
+    if (!confirmed) return;
+
+    setBusy(true);
+    setMessage("");
+    try {
+      await clearExpenses();
+      setSelectedBackup(null);
+      setFileName("");
+      if (inputRef.current) inputRef.current.value = "";
+      onRestored();
+      setMessage("همهٔ هزینه‌ها از این دستگاه پاک شدند. اکنون می‌توانید داده‌های جدید وارد کنید.");
+    } catch {
+      setMessage("پاک‌کردن داده‌ها انجام نشد. دوباره تلاش کنید.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="expense-panel" aria-labelledby="expense-backup-title">
       <h2 id="expense-backup-title">پشتیبان‌گیری و بازیابی</h2>
@@ -104,6 +147,11 @@ export default function ExpenseBackup({ currentCount, onRestored }: Props) {
           <button className="expense-button expense-button--primary" type="button" onClick={restoreBackup} disabled={busy}>بازیابی داده‌ها</button>
         </div>
       )}
+      <div className="expense-delete-all">
+        <h3>پاک‌کردن همهٔ داده‌ها</h3>
+        <p>این کار همهٔ هزینه‌های ذخیره‌شده در این برنامه روی همین دستگاه را حذف می‌کند. برای نگه‌داشتن نسخه‌ای از آن‌ها، ابتدا فایل پشتیبان JSON بگیرید.</p>
+        <button className="expense-button expense-button--danger" type="button" onClick={deleteAllData} disabled={busy || currentCount === 0}>پاک‌کردن همهٔ هزینه‌ها</button>
+      </div>
       {message && <p className="expense-backup-message" role="status">{message}</p>}
     </section>
   );

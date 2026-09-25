@@ -56,6 +56,11 @@
 .expense-app .expense-restore-preview { margin-top: 16px; padding: 16px; border: 1px solid #a8834b; border-radius: 9px; background: #30291e; }
 .expense-app .expense-restore-preview p { margin: 0 0 10px; }
 .expense-app .expense-backup-message { margin: 14px 0 0; color: #e8c891; }
+.expense-app .expense-delete-all { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--expense-border); }
+.expense-app .expense-delete-all h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.expense-app .expense-delete-all p { margin: 0 0 12px; color: #b7c0cc; }
+.expense-app .expense-button--danger { border-color: #b96868; background: #4a252b; color: #fff1f1; }
+.expense-app .expense-button--danger:hover { background: #613038; }
 .expense-app .expense-report-sections { display: grid; gap: 28px; }
 .expense-app .expense-report-sections h3 { margin: 0; font-size: 1.05rem; }
 .expense-app .expense-report-caption { margin: 4px 0 12px; color: #b7c0cc; font-size: .9rem; }

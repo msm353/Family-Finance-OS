@@ -375,7 +375,7 @@ export default function Home() {
   return (
     <main className="expense-app" dir="rtl">
       <h1>💰 Family Finance OS</h1>
-      <p className="expense-subtitle">نسخه آزمایشی 0.1.0-beta</p>
+      <p className="expense-subtitle">نسخه آزمایشی 0.1.1-beta</p>
       <PwaStatus />
 
       <ExpenseSummary expenses={filteredExpenses} />

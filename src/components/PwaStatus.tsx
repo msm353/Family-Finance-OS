@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Capacitor } from "@capacitor/core";
 
 interface InstallPromptEvent extends Event {
   prompt(): Promise<{ outcome: "accepted" | "dismissed" }>;
@@ -23,7 +24,7 @@ export default function PwaStatus() {
     window.addEventListener("offline", onOffline);
     window.addEventListener("online", onOnline);
 
-    if (!import.meta.env.PROD || !("serviceWorker" in navigator)) {
+    if (Capacitor.isNativePlatform() || !import.meta.env.PROD || !("serviceWorker" in navigator)) {
       return () => {
         window.removeEventListener("beforeinstallprompt", onInstallPrompt);
         window.removeEventListener("appinstalled", onInstalled);
