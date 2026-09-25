@@ -20,10 +20,6 @@ type ExpenseFormProps = {
   onFinishedEditing: () => void;
 };
 
-function getTodayDate() {
-  return formatDateForStorage(new Date());
-}
-
 function formatDateForStorage(date: Date) {
   const year = date.getFullYear();
 
@@ -38,6 +34,12 @@ function formatDateForStorage(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function getTodayDate() {
+  return formatDateForStorage(
+    new Date()
+  );
+}
+
 function parseStoredDate(value: string) {
   const match = value.match(
     /^(\d{4})-(\d{2})-(\d{2})$/
@@ -47,7 +49,8 @@ function parseStoredDate(value: string) {
     return new Date();
   }
 
-  const [, year, month, day] = match;
+  const [, year, month, day] =
+    match;
 
   return new Date(
     Number(year),
@@ -56,11 +59,47 @@ function parseStoredDate(value: string) {
   );
 }
 
-function formatAmountInput(value: string) {
-  const digitsOnly = value.replace(
-    /\D/g,
-    ""
-  );
+function normalizeDigits(
+  value: string
+) {
+  const persianDigits =
+    "۰۱۲۳۴۵۶۷۸۹";
+
+  const arabicDigits =
+    "٠١٢٣٤٥٦٧٨٩";
+
+  return value
+    .replace(
+      /[۰-۹]/g,
+      (digit) =>
+        String(
+          persianDigits.indexOf(
+            digit
+          )
+        )
+    )
+    .replace(
+      /[٠-٩]/g,
+      (digit) =>
+        String(
+          arabicDigits.indexOf(
+            digit
+          )
+        )
+    );
+}
+
+function formatAmountInput(
+  value: string
+) {
+  const normalized =
+    normalizeDigits(value);
+
+  const digitsOnly =
+    normalized.replace(
+      /\D/g,
+      ""
+    );
 
   if (!digitsOnly) {
     return "";
@@ -71,9 +110,17 @@ function formatAmountInput(value: string) {
   ).toLocaleString("en-US");
 }
 
-function getNumericAmount(value: string) {
+function getNumericAmount(
+  value: string
+) {
+  const normalized =
+    normalizeDigits(value);
+
   return Number(
-    value.replace(/,/g, "")
+    normalized.replace(
+      /,/g,
+      ""
+    )
   );
 }
 
@@ -94,7 +141,9 @@ export default function ExpenseForm({
   const [
     paymentMethod,
     setPaymentMethod,
-  ] = useState(paymentMethods[0]);
+  ] = useState(
+    paymentMethods[0]
+  );
 
   const [
     description,
@@ -110,56 +159,68 @@ export default function ExpenseForm({
   ] = useState(false);
 
   useEffect(() => {
-    if (editingExpense) {
-      setStoreName(
-        editingExpense.storeName
-      );
-
-      setAmount(
-        editingExpense.amount.toLocaleString(
-          "en-US"
-        )
-      );
-
-      setCategory(
-        editingExpense.category
-      );
-
-      setPaymentMethod(
-        editingExpense.paymentMethod
-      );
-
-      setDescription(
-        editingExpense.description || ""
-      );
-
-      if (
-        /^\d{4}-\d{2}-\d{2}$/.test(
-          editingExpense.date
-        )
-      ) {
-        setDate(
-          editingExpense.date
-        );
-      } else {
-        setDate(getTodayDate());
-      }
-
-      setIsCalendarOpen(false);
+    if (!editingExpense) {
+      return;
     }
+
+    setStoreName(
+      editingExpense.storeName
+    );
+
+    setAmount(
+      editingExpense.amount.toLocaleString(
+        "en-US"
+      )
+    );
+
+    setCategory(
+      editingExpense.category
+    );
+
+    setPaymentMethod(
+      editingExpense.paymentMethod
+    );
+
+    setDescription(
+      editingExpense.description ||
+        ""
+    );
+
+    if (
+      /^\d{4}-\d{2}-\d{2}$/.test(
+        editingExpense.date
+      )
+    ) {
+      setDate(
+        editingExpense.date
+      );
+    } else {
+      setDate(
+        getTodayDate()
+      );
+    }
+
+    setIsCalendarOpen(false);
   }, [editingExpense]);
 
   function clearForm() {
     setStoreName("");
     setAmount("");
-    setCategory(categories[0]);
+
+    setCategory(
+      categories[0]
+    );
 
     setPaymentMethod(
       paymentMethods[0]
     );
 
     setDescription("");
-    setDate(getTodayDate());
+
+    setDate(
+      getTodayDate()
+    );
+
     setIsCalendarOpen(false);
   }
 
@@ -171,7 +232,9 @@ export default function ExpenseForm({
         e.target.value
       );
 
-    setAmount(formattedValue);
+    setAmount(
+      formattedValue
+    );
   }
 
   function handleDateChange(
@@ -196,13 +259,17 @@ export default function ExpenseForm({
     }
 
     if (!amount.trim()) {
-      alert("مبلغ را وارد کنید.");
+      alert(
+        "مبلغ را وارد کنید."
+      );
 
       return;
     }
 
     const numericAmount =
-      getNumericAmount(amount);
+      getNumericAmount(
+        amount
+      );
 
     if (
       !Number.isFinite(
@@ -229,7 +296,8 @@ export default function ExpenseForm({
       storeName:
         storeName.trim(),
 
-      amount: numericAmount,
+      amount:
+        numericAmount,
 
       category,
 
@@ -241,7 +309,8 @@ export default function ExpenseForm({
       date,
 
       createdAt:
-        editingExpense?.createdAt ??
+        editingExpense
+          ?.createdAt ??
         new Date().toISOString(),
 
       confirmed: true,
@@ -268,7 +337,9 @@ export default function ExpenseForm({
       expenseData
     );
 
-    alert("✅ هزینه ثبت شد.");
+    alert(
+      "✅ هزینه ثبت شد."
+    );
 
     clearForm();
 
@@ -296,7 +367,8 @@ export default function ExpenseForm({
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label htmlFor="store-name">
@@ -319,14 +391,16 @@ export default function ExpenseForm({
               "border-box",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
+            borderRadius:
+              "6px",
           }}
         />
       </div>
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label htmlFor="expense-amount">
@@ -337,6 +411,7 @@ export default function ExpenseForm({
           id="expense-amount"
           type="text"
           inputMode="numeric"
+          autoComplete="off"
           value={amount}
           onChange={
             handleAmountChange
@@ -352,14 +427,16 @@ export default function ExpenseForm({
             textAlign: "right",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
+            borderRadius:
+              "6px",
           }}
         />
       </div>
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label>
@@ -370,7 +447,8 @@ export default function ExpenseForm({
           type="button"
           onClick={() =>
             setIsCalendarOpen(
-              (current) => !current
+              (current) =>
+                !current
             )
           }
           style={{
@@ -381,10 +459,16 @@ export default function ExpenseForm({
               "border-box",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
-            background: "transparent",
-            cursor: "pointer",
-            textAlign: "right",
+            borderRadius:
+              "6px",
+            background:
+              "transparent",
+            cursor:
+              "pointer",
+            textAlign:
+              "right",
+            touchAction:
+              "manipulation",
           }}
         >
           {formatJalaliNumeric(
@@ -395,11 +479,14 @@ export default function ExpenseForm({
         {isCalendarOpen && (
           <div
             style={{
-              marginTop: "8px",
+              marginTop:
+                "8px",
             }}
           >
             <Calendar
-              value={selectedDate}
+              value={
+                selectedDate
+              }
               onChange={
                 handleDateChange
               }
@@ -410,7 +497,8 @@ export default function ExpenseForm({
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label htmlFor="expense-category">
@@ -433,7 +521,8 @@ export default function ExpenseForm({
               "border-box",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
+            borderRadius:
+              "6px",
           }}
         >
           {categories.map(
@@ -451,7 +540,8 @@ export default function ExpenseForm({
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label htmlFor="payment-method">
@@ -460,7 +550,9 @@ export default function ExpenseForm({
 
         <select
           id="payment-method"
-          value={paymentMethod}
+          value={
+            paymentMethod
+          }
           onChange={(e) =>
             setPaymentMethod(
               e.target.value
@@ -474,7 +566,8 @@ export default function ExpenseForm({
               "border-box",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
+            borderRadius:
+              "6px",
           }}
         >
           {paymentMethods.map(
@@ -492,7 +585,8 @@ export default function ExpenseForm({
 
       <div
         style={{
-          marginBottom: "15px",
+          marginBottom:
+            "15px",
         }}
       >
         <label htmlFor="expense-description">
@@ -501,7 +595,9 @@ export default function ExpenseForm({
 
         <textarea
           id="expense-description"
-          value={description}
+          value={
+            description
+          }
           onChange={(e) =>
             setDescription(
               e.target.value
@@ -515,18 +611,23 @@ export default function ExpenseForm({
               "border-box",
             border:
               "1px solid #ddd",
-            borderRadius: "6px",
+            borderRadius:
+              "6px",
           }}
         />
       </div>
 
       <button
         type="button"
-        onClick={handleSubmit}
+        onClick={
+          handleSubmit
+        }
         style={{
           width: "100%",
           padding: "12px",
           cursor: "pointer",
+          touchAction:
+            "manipulation",
         }}
       >
         {editingExpense
@@ -544,8 +645,12 @@ export default function ExpenseForm({
           style={{
             width: "100%",
             padding: "12px",
-            marginTop: "10px",
-            cursor: "pointer",
+            marginTop:
+              "10px",
+            cursor:
+              "pointer",
+            touchAction:
+              "manipulation",
           }}
         >
           انصراف

@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseList from "../components/ExpenseList";
-import ExpenseSummary from "../components/ExpenseSummary";
 import ExpenseSearch from "../components/ExpenseSearch";
+import ExpenseSummary from "../components/ExpenseSummary";
+
+import {
+  DateRangePicker,
+  type DateRange,
+} from "../components/ui/date-range-picker";
 
 import { categories } from "../constants/categories";
 import { paymentMethods } from "../constants/paymentMethods";
 
 import type { Expense } from "../models/Expense";
+
 import { getExpenses } from "../services/expenseService";
 
 import { exportExpensesToCsv } from "../utils/exportExpensesToCsv";
@@ -18,6 +24,11 @@ type SortOption =
   | "oldest"
   | "highest"
   | "lowest";
+
+const EMPTY_DATE_RANGE: DateRange = {
+  from: null,
+  to: null,
+};
 
 function hasSortableDate(date: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -37,37 +48,70 @@ function formatLocalDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function startOfDay(date: Date) {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+}
+
 function compareExpenseDates(
   a: Expense,
   b: Expense
 ) {
-  const aHasDate = hasSortableDate(a.date);
-  const bHasDate = hasSortableDate(b.date);
+  const aHasDate =
+    hasSortableDate(a.date);
 
-  if (aHasDate && bHasDate) {
-    return a.date.localeCompare(b.date);
+  const bHasDate =
+    hasSortableDate(b.date);
+
+  if (
+    aHasDate &&
+    bHasDate
+  ) {
+    return a.date.localeCompare(
+      b.date
+    );
   }
 
-  if (aHasDate && !bHasDate) {
+  if (
+    aHasDate &&
+    !bHasDate
+  ) {
     return 1;
   }
 
-  if (!aHasDate && bHasDate) {
+  if (
+    !aHasDate &&
+    bHasDate
+  ) {
     return -1;
   }
 
-  return (a.id ?? 0) - (b.id ?? 0);
+  return (
+    (a.id ?? 0) -
+    (b.id ?? 0)
+  );
 }
 
 export default function Home() {
-  const [expenses, setExpenses] =
-    useState<Expense[]>([]);
+  const [
+    expenses,
+    setExpenses,
+  ] = useState<Expense[]>([]);
 
-  const [editingExpense, setEditingExpense] =
-    useState<Expense | undefined>(undefined);
+  const [
+    editingExpense,
+    setEditingExpense,
+  ] = useState<
+    Expense | undefined
+  >(undefined);
 
-  const [searchText, setSearchText] =
-    useState("");
+  const [
+    searchText,
+    setSearchText,
+  ] = useState("");
 
   const [
     selectedCategory,
@@ -79,17 +123,26 @@ export default function Home() {
     setSelectedPaymentMethod,
   ] = useState("همه");
 
-  const [sortOption, setSortOption] =
-    useState<SortOption>("newest");
+  const [
+    sortOption,
+    setSortOption,
+  ] =
+    useState<SortOption>(
+      "newest"
+    );
 
-  const [fromDate, setFromDate] =
-    useState("");
-
-  const [toDate, setToDate] =
-    useState("");
+  const [
+    dateRange,
+    setDateRange,
+  ] =
+    useState<DateRange>(
+      EMPTY_DATE_RANGE
+    );
 
   async function loadExpenses() {
-    const data = await getExpenses();
+    const data =
+      await getExpenses();
+
     setExpenses(data);
   }
 
@@ -97,157 +150,246 @@ export default function Home() {
     loadExpenses();
   }, []);
 
-  function handleEdit(expense: Expense) {
-    setEditingExpense(expense);
+  function handleEdit(
+    expense: Expense
+  ) {
+    setEditingExpense(
+      expense
+    );
   }
 
   function handleFinishedEditing() {
-    setEditingExpense(undefined);
+    setEditingExpense(
+      undefined
+    );
+
     loadExpenses();
   }
 
-  function handleSearch(value: string) {
+  function handleSearch(
+    value: string
+  ) {
     setSearchText(value);
-  }
-
-  function setQuickDateRange(days: number) {
-    const today = new Date();
-
-    const startDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-
-    startDate.setDate(
-      startDate.getDate() - (days - 1)
-    );
-
-    setFromDate(
-      formatLocalDate(startDate)
-    );
-
-    setToDate(
-      formatLocalDate(today)
-    );
   }
 
   function filterToday() {
     const today =
-      formatLocalDate(new Date());
+      startOfDay(
+        new Date()
+      );
 
-    setFromDate(today);
-    setToDate(today);
+    setDateRange({
+      from: today,
+      to: today,
+    });
+  }
+
+  function setQuickDateRange(
+    days: number
+  ) {
+    const today =
+      startOfDay(
+        new Date()
+      );
+
+    const start =
+      new Date(today);
+
+    start.setDate(
+      start.getDate() -
+        (days - 1)
+    );
+
+    setDateRange({
+      from: start,
+      to: today,
+    });
   }
 
   function clearFilters() {
     setSearchText("");
-    setSelectedCategory("همه");
-    setSelectedPaymentMethod("همه");
-    setFromDate("");
-    setToDate("");
-    setSortOption("newest");
+
+    setSelectedCategory(
+      "همه"
+    );
+
+    setSelectedPaymentMethod(
+      "همه"
+    );
+
+    setSortOption(
+      "newest"
+    );
+
+    setDateRange({
+      from: null,
+      to: null,
+    });
   }
 
+  const fromDate =
+    dateRange.from
+      ? formatLocalDate(
+          dateRange.from
+        )
+      : "";
+
+  const toDate =
+    dateRange.to
+      ? formatLocalDate(
+          dateRange.to
+        )
+      : "";
+
   const normalizedSearchText =
-    searchText.trim().toLowerCase();
+    searchText
+      .trim()
+      .toLowerCase();
 
   const filteredExpenses =
-    expenses.filter((expense) => {
-      const matchesSearch =
-        !normalizedSearchText ||
-        expense.storeName
-          .toLowerCase()
-          .includes(normalizedSearchText) ||
-        expense.category
-          .toLowerCase()
-          .includes(normalizedSearchText) ||
-        expense.paymentMethod
-          .toLowerCase()
-          .includes(normalizedSearchText) ||
-        (expense.description ?? "")
-          .toLowerCase()
-          .includes(normalizedSearchText);
+    expenses.filter(
+      (expense) => {
+        const matchesSearch =
+          !normalizedSearchText ||
+          expense.storeName
+            .toLowerCase()
+            .includes(
+              normalizedSearchText
+            ) ||
+          expense.category
+            .toLowerCase()
+            .includes(
+              normalizedSearchText
+            ) ||
+          expense.paymentMethod
+            .toLowerCase()
+            .includes(
+              normalizedSearchText
+            ) ||
+          (
+            expense.description ??
+            ""
+          )
+            .toLowerCase()
+            .includes(
+              normalizedSearchText
+            );
 
-      const matchesCategory =
-        selectedCategory === "همه" ||
-        expense.category ===
-          selectedCategory;
+        const matchesCategory =
+          selectedCategory ===
+            "همه" ||
+          expense.category ===
+            selectedCategory;
 
-      const matchesPaymentMethod =
-        selectedPaymentMethod === "همه" ||
-        expense.paymentMethod ===
-          selectedPaymentMethod;
+        const matchesPaymentMethod =
+          selectedPaymentMethod ===
+            "همه" ||
+          expense.paymentMethod ===
+            selectedPaymentMethod;
 
-      const expenseHasDate =
-        hasSortableDate(expense.date);
+        const expenseHasDate =
+          hasSortableDate(
+            expense.date
+          );
 
-      const matchesFromDate =
-        !fromDate ||
-        (expenseHasDate &&
-          expense.date >= fromDate);
+        const matchesFromDate =
+          !fromDate ||
+          (
+            expenseHasDate &&
+            expense.date >=
+              fromDate
+          );
 
-      const matchesToDate =
-        !toDate ||
-        (expenseHasDate &&
-          expense.date <= toDate);
+        const matchesToDate =
+          !toDate ||
+          (
+            expenseHasDate &&
+            expense.date <=
+              toDate
+          );
 
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesPaymentMethod &&
-        matchesFromDate &&
-        matchesToDate
-      );
-    });
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesPaymentMethod &&
+          matchesFromDate &&
+          matchesToDate
+        );
+      }
+    );
 
   const sortedExpenses = [
     ...filteredExpenses,
-  ].sort((a, b) => {
-    switch (sortOption) {
-      case "oldest":
-        return compareExpenseDates(a, b);
+  ].sort(
+    (a, b) => {
+      switch (
+        sortOption
+      ) {
+        case "oldest":
+          return compareExpenseDates(
+            a,
+            b
+          );
 
-      case "highest":
-        return b.amount - a.amount;
+        case "highest":
+          return (
+            b.amount -
+            a.amount
+          );
 
-      case "lowest":
-        return a.amount - b.amount;
+        case "lowest":
+          return (
+            a.amount -
+            b.amount
+          );
 
-      case "newest":
-      default:
-        return compareExpenseDates(b, a);
+        case "newest":
+        default:
+          return compareExpenseDates(
+            b,
+            a
+          );
+      }
     }
-  });
+  );
 
   return (
     <main
       style={{
         direction: "rtl",
         maxWidth: "700px",
-        margin: "40px auto",
+        margin:
+          "40px auto",
         padding: "20px",
-        fontFamily: "sans-serif",
+        fontFamily:
+          "Vazirmatn, sans-serif",
       }}
     >
-      <h1>💰 Family Finance OS</h1>
+      <h1>
+        💰 Family Finance OS
+      </h1>
 
       <p
         style={{
           color: "#666",
-          marginBottom: "30px",
+          marginBottom:
+            "30px",
         }}
       >
         نسخه آزمایشی 0.1.0
       </p>
 
       <ExpenseSummary
-        expenses={filteredExpenses}
+        expenses={
+          filteredExpenses
+        }
       />
 
       <ExpenseSearch
         value={searchText}
-        onSearch={handleSearch}
+        onSearch={
+          handleSearch
+        }
       />
 
       <div
@@ -256,24 +398,30 @@ export default function Home() {
           gridTemplateColumns:
             "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "12px",
-          marginBottom: "12px",
+          marginBottom:
+            "12px",
         }}
       >
         <div>
           <label
             htmlFor="category-filter"
             style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "bold",
+              display:
+                "block",
+              marginBottom:
+                "6px",
+              fontWeight:
+                "bold",
             }}
           >
-            🏷 دسته‌بندی
+            🗂️ دسته‌بندی
           </label>
 
           <select
             id="category-filter"
-            value={selectedCategory}
+            value={
+              selectedCategory
+            }
             onChange={(e) =>
               setSelectedCategory(
                 e.target.value
@@ -282,9 +430,12 @@ export default function Home() {
             style={{
               width: "100%",
               padding: "12px",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
+              boxSizing:
+                "border-box",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ddd",
             }}
           >
             <option value="همه">
@@ -294,8 +445,12 @@ export default function Home() {
             {categories.map(
               (category) => (
                 <option
-                  key={category}
-                  value={category}
+                  key={
+                    category
+                  }
+                  value={
+                    category
+                  }
                 >
                   {category}
                 </option>
@@ -308,9 +463,12 @@ export default function Home() {
           <label
             htmlFor="payment-filter"
             style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "bold",
+              display:
+                "block",
+              marginBottom:
+                "6px",
+              fontWeight:
+                "bold",
             }}
           >
             💳 روش پرداخت
@@ -329,9 +487,12 @@ export default function Home() {
             style={{
               width: "100%",
               padding: "12px",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
+              boxSizing:
+                "border-box",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ddd",
             }}
           >
             <option value="همه">
@@ -341,8 +502,12 @@ export default function Home() {
             {paymentMethods.map(
               (method) => (
                 <option
-                  key={method}
-                  value={method}
+                  key={
+                    method
+                  }
+                  value={
+                    method
+                  }
                 >
                   {method}
                 </option>
@@ -355,9 +520,12 @@ export default function Home() {
           <label
             htmlFor="sort-expenses"
             style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "bold",
+              display:
+                "block",
+              marginBottom:
+                "6px",
+              fontWeight:
+                "bold",
             }}
           >
             ↕️ مرتب‌سازی
@@ -375,9 +543,12 @@ export default function Home() {
             style={{
               width: "100%",
               padding: "12px",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
+              boxSizing:
+                "border-box",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ddd",
             }}
           >
             <option value="newest">
@@ -401,18 +572,52 @@ export default function Home() {
 
       <div
         style={{
+          marginBottom:
+            "12px",
+        }}
+      >
+        <label
+          style={{
+            display:
+              "block",
+            marginBottom:
+              "6px",
+            fontWeight:
+              "bold",
+          }}
+        >
+          📅 بازه تاریخ
+        </label>
+
+        <DateRangePicker
+          value={dateRange}
+          onChange={
+            setDateRange
+          }
+          months={2}
+          placeholder="انتخاب بازه تاریخ"
+        />
+      </div>
+
+      <div
+        style={{
           display: "flex",
           flexWrap: "wrap",
           gap: "8px",
-          marginBottom: "12px",
+          marginBottom:
+            "12px",
         }}
       >
         <button
           type="button"
-          onClick={filterToday}
+          onClick={
+            filterToday
+          }
           style={{
-            padding: "10px 14px",
-            cursor: "pointer",
+            padding:
+              "10px 14px",
+            cursor:
+              "pointer",
           }}
         >
           امروز
@@ -421,11 +626,15 @@ export default function Home() {
         <button
           type="button"
           onClick={() =>
-            setQuickDateRange(7)
+            setQuickDateRange(
+              7
+            )
           }
           style={{
-            padding: "10px 14px",
-            cursor: "pointer",
+            padding:
+              "10px 14px",
+            cursor:
+              "pointer",
           }}
         >
           ۷ روز اخیر
@@ -434,11 +643,15 @@ export default function Home() {
         <button
           type="button"
           onClick={() =>
-            setQuickDateRange(30)
+            setQuickDateRange(
+              30
+            )
           }
           style={{
-            padding: "10px 14px",
-            cursor: "pointer",
+            padding:
+              "10px 14px",
+            cursor:
+              "pointer",
           }}
         >
           ۳۰ روز اخیر
@@ -450,85 +663,20 @@ export default function Home() {
           display: "grid",
           gridTemplateColumns:
             "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-          marginBottom: "12px",
-        }}
-      >
-        <div>
-          <label
-            htmlFor="from-date"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "bold",
-            }}
-          >
-            📅 از تاریخ
-          </label>
-
-          <input
-            id="from-date"
-            type="date"
-            value={fromDate}
-            onChange={(e) =>
-              setFromDate(e.target.value)
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-            }}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="to-date"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "bold",
-            }}
-          >
-            📅 تا تاریخ
-          </label>
-
-          <input
-            id="to-date"
-            type="date"
-            value={toDate}
-            min={fromDate || undefined}
-            onChange={(e) =>
-              setToDate(e.target.value)
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-            }}
-          />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "10px",
-          marginBottom: "20px",
+          marginBottom:
+            "20px",
         }}
       >
         <button
           type="button"
-          onClick={clearFilters}
+          onClick={
+            clearFilters
+          }
           style={{
             padding: "10px",
-            cursor: "pointer",
+            cursor:
+              "pointer",
           }}
         >
           ↩️ پاک کردن فیلترها
@@ -543,7 +691,8 @@ export default function Home() {
           }
           style={{
             padding: "10px",
-            cursor: "pointer",
+            cursor:
+              "pointer",
           }}
         >
           📤 خروجی CSV
@@ -551,26 +700,39 @@ export default function Home() {
       </div>
 
       <ExpenseForm
-        onExpenseAdded={loadExpenses}
-        editingExpense={editingExpense}
+        onExpenseAdded={
+          loadExpenses
+        }
+        editingExpense={
+          editingExpense
+        }
         onFinishedEditing={
           handleFinishedEditing
         }
       />
 
       <ExpenseList
-        expenses={sortedExpenses}
-        onExpenseDeleted={loadExpenses}
-        onExpenseEdit={handleEdit}
+        expenses={
+          sortedExpenses
+        }
+        onExpenseDeleted={
+          loadExpenses
+        }
+        onExpenseEdit={
+          handleEdit
+        }
       />
 
       <hr
         style={{
-          margin: "30px 0",
+          margin:
+            "30px 0",
         }}
       />
 
-      <h2>هدف پروژه</h2>
+      <h2>
+        هدف پروژه
+      </h2>
 
       <p>
         سیستم مدیریت مالی خانوادگی کاملاً آفلاین

@@ -3,4 +3,6 @@ export const paymentMethods: string[] = [
   "💵 نقد",
   "🏦 انتقال",
   "📱 کیف پول",
+  "💳 اعتباری",
+  "🧾 چهار قسطه",
 ];
