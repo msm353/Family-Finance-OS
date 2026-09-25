@@ -3,7 +3,8 @@
 import * as React from "react";
 import { CalendarRange, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn, fa } from "@/lib/utils";
-import { eventInside, FloatPortal, useFloat } from "@/lib/float";
+import { eventInside, useFloat } from "@/lib/float";
+import { FloatPortal } from "@/lib/FloatPortal";
 import { JALALI_MONTHS, JALALI_WEEKDAYS_SHORT, formatJalali, jalaliMonthLength, jalaliWeekday, toGregorian, toJalali } from "@/lib/jalali";
 
 export type DateRange = { from: Date | null; to: Date | null };
@@ -30,14 +31,14 @@ const sameDay = (a: Date | null | undefined, b: Date) => !!a && day(a).getTime()
 const ordered = (a: Date, b: Date): [Date, Date] => (a <= b ? [a, b] : [b, a]);
 
 /** Days in the range, both ends included. */
-export function rangeLength(range: DateRange) {
+function rangeLength(range: DateRange) {
   if (!range.from || !range.to) return 0;
   const [a, b] = ordered(day(range.from), day(range.to));
   return Math.round((b.getTime() - a.getTime()) / 864e5) + 1;
 }
 
 /** «۱۲ تا ۲۵ مهر ۱۴۰۵»، «۲۸ شهریور تا ۳ مهر ۱۴۰۵»، «۲۵ اسفند ۱۴۰۴ تا ۵ فروردین ۱۴۰۵». */
-export function formatJalaliRange(range: DateRange) {
+function formatJalaliRange(range: DateRange) {
   if (!range.from) return "";
   if (!range.to) return `از ${formatJalali(range.from)}`;
   const [a, b] = ordered(range.from, range.to);
@@ -187,7 +188,7 @@ export type RangePreset = { label: string; range: () => DateRange };
 const ago = (n: number) => { const d = day(new Date()); d.setDate(d.getDate() - n); return d; };
 
 /** «امروز»، «۷ روز گذشته»، «۳۰ روز گذشته»، «این ماه». */
-export const defaultRangePresets: RangePreset[] = [
+const defaultRangePresets: RangePreset[] = [
   { label: "امروز", range: () => ({ from: ago(0), to: ago(0) }) },
   { label: "۷ روز گذشته", range: () => ({ from: ago(6), to: ago(0) }) },
   { label: "۳۰ روز گذشته", range: () => ({ from: ago(29), to: ago(0) }) },

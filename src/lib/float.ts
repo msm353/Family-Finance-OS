@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 /** Copy `data-theme` from an in-tree trigger onto a portaled panel. */
 export function themeOf(el: Element | null | undefined) {
@@ -66,7 +65,7 @@ export function useFloat(
   opts: { side?: FloatSide; align?: FloatAlign; gap?: number; matchWidth?: boolean } = {},
 ) {
   const { side = "bottom", align = "start", gap = 8, matchWidth = false } = opts;
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = typeof document !== "undefined";
   const [style, setStyle] = React.useState<React.CSSProperties>({});
   const [theme, setTheme] = React.useState<string | undefined>();
   const panel = React.useRef<HTMLDivElement>(null);
@@ -77,8 +76,6 @@ export function useFloat(
     setStyle(floatStyle(el, { side, align, gap, matchWidth, panel: panel.current }));
     setTheme(themeOf(el));
   }, [anchor, side, align, gap, matchWidth]);
-
-  React.useEffect(() => setMounted(true), []);
 
   React.useLayoutEffect(() => {
     if (!open) return;
@@ -92,32 +89,4 @@ export function useFloat(
   }, [open, update]);
 
   return { mounted, style, theme, panel, update };
-}
-
-/** Renders `children` into `document.body` so overflow:hidden ancestors cannot clip them. */
-export function FloatPortal({
-  open,
-  mounted,
-  style,
-  theme,
-  panelRef,
-  className,
-  children,
-  ...rest
-}: {
-  open: boolean;
-  mounted: boolean;
-  style: React.CSSProperties;
-  theme?: string;
-  panelRef?: React.Ref<HTMLDivElement>;
-  className?: string;
-  children: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>) {
-  if (!mounted || !open) return null;
-  return createPortal(
-    <div ref={panelRef} data-theme={theme} style={style} className={className} {...rest}>
-      {children}
-    </div>,
-    document.body,
-  );
 }

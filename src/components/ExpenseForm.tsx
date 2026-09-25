@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Calendar } from "./ui/calendar";
 
@@ -130,78 +130,35 @@ export default function ExpenseForm({
   onFinishedEditing,
 }: ExpenseFormProps) {
   const [storeName, setStoreName] =
-    useState("");
+    useState(editingExpense?.storeName ?? "");
 
   const [amount, setAmount] =
-    useState("");
+    useState(editingExpense ? editingExpense.amount.toLocaleString("en-US") : "");
 
   const [category, setCategory] =
-    useState(categories[0]);
+    useState(editingExpense?.category ?? categories[0]);
 
   const [
     paymentMethod,
     setPaymentMethod,
   ] = useState(
-    paymentMethods[0]
+    editingExpense?.paymentMethod ?? paymentMethods[0]
   );
 
   const [
     description,
     setDescription,
-  ] = useState("");
+  ] = useState(editingExpense?.description ?? "");
 
   const [date, setDate] =
-    useState(getTodayDate());
+    useState(editingExpense && /^\d{4}-\d{2}-\d{2}$/.test(editingExpense.date)
+      ? editingExpense.date
+      : getTodayDate());
 
   const [
     isCalendarOpen,
     setIsCalendarOpen,
   ] = useState(false);
-
-  useEffect(() => {
-    if (!editingExpense) {
-      return;
-    }
-
-    setStoreName(
-      editingExpense.storeName
-    );
-
-    setAmount(
-      editingExpense.amount.toLocaleString(
-        "en-US"
-      )
-    );
-
-    setCategory(
-      editingExpense.category
-    );
-
-    setPaymentMethod(
-      editingExpense.paymentMethod
-    );
-
-    setDescription(
-      editingExpense.description ||
-        ""
-    );
-
-    if (
-      /^\d{4}-\d{2}-\d{2}$/.test(
-        editingExpense.date
-      )
-    ) {
-      setDate(
-        editingExpense.date
-      );
-    } else {
-      setDate(
-        getTodayDate()
-      );
-    }
-
-    setIsCalendarOpen(false);
-  }, [editingExpense]);
 
   function clearForm() {
     setStoreName("");

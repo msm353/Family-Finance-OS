@@ -153,7 +153,13 @@ export default function Home() {
   }
 
   useEffect(() => {
-    loadExpenses();
+    let active = true;
+    getExpenses().then((data) => {
+      if (active) setExpenses(data);
+    }).catch((error) => {
+      console.error("بارگذاری هزینه‌ها انجام نشد.", error);
+    });
+    return () => { active = false; };
   }, []);
 
   function handleEdit(
@@ -369,7 +375,7 @@ export default function Home() {
   return (
     <main className="expense-app" dir="rtl">
       <h1>💰 Family Finance OS</h1>
-      <p className="expense-subtitle">نسخه آزمایشی 0.1.0</p>
+      <p className="expense-subtitle">نسخه آزمایشی 0.1.0-beta</p>
       <PwaStatus />
 
       <ExpenseSummary expenses={filteredExpenses} />
@@ -421,7 +427,7 @@ export default function Home() {
       </section>
 
       <ExpenseReports expenses={filteredExpenses} />
-      <ExpenseForm key={restoreGeneration} onExpenseAdded={loadExpenses} editingExpense={editingExpense}
+      <ExpenseForm key={`${restoreGeneration}-${editingExpense?.id ?? "new"}`} onExpenseAdded={loadExpenses} editingExpense={editingExpense}
         onFinishedEditing={handleFinishedEditing} />
       <ExpenseList expenses={sortedExpenses} onExpenseDeleted={loadExpenses} onExpenseEdit={handleEdit} />
       <ExpenseBackup currentCount={expenses.length} onRestored={handleRestored} />

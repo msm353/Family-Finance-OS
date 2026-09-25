@@ -1,75 +1,43 @@
-# React + TypeScript + Vite
+# Family Finance OS (FFOS)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+FFOS یک برنامهٔ آزمایشی برای ثبت و بررسی هزینه‌های خانوادگی است. داده‌ها در مرورگر همان دستگاه ذخیره می‌شوند و پس از بارگذاری اولیه، برنامه بدون اینترنت هم کار می‌کند.
 
-Currently, two official plugins are available:
+**وضعیت نسخه:** `0.1.0-beta`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## امکانات فعلی
 
-## React Compiler
+- ثبت، ویرایش و حذف هزینه با تاریخ شمسی، دسته‌بندی و روش پرداخت
+- جستجو، فیلتر بازهٔ تاریخ و مرتب‌سازی هزینه‌ها
+- خلاصهٔ هزینه‌ها و گزارش ماهانه و روش‌های پرداخت
+- خروجی CSV از هزینه‌های فیلترشده
+- پشتیبان‌گیری کامل JSON و بازیابی آن با تأیید پیش از جایگزینی داده‌ها
+- نصب به‌صورت برنامهٔ وب و استفادهٔ آفلاین پس از اولین بازدید آنلاین
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## استفاده روی گوشی
 
-## Expanding the ESLint configuration
+نسخهٔ میزبانی‌شده در [نشانی FFOS](https://ffos-msm353.new-parandcity.chatgpt.site) فعلاً دسترسی خصوصی دارد. آن را با حساب مجاز باز کنید. در مرورگر، گزینهٔ «نصب برنامه» یا «افزودن به صفحهٔ اصلی» را انتخاب کنید. برای کار آفلاین، برنامه باید یک‌بار هنگام اتصال به اینترنت کامل بارگذاری شده باشد.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+هزینه‌ها در پایگاه دادهٔ مرورگر هر دستگاه نگه‌داری می‌شوند. بین گوشی و رایانه همگام‌سازی خودکار وجود ندارد. پیش از پاک‌کردن داده‌های مرورگر یا تعویض دستگاه، از بخش «پشتیبان‌گیری و بازیابی» فایل JSON بگیرید. خروجی CSV برای گزارش‌گیری است و جایگزین فایل پشتیبان JSON نیست.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## اجرای محلی
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+به Node.js و npm نیاز دارید:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+برای بررسی نسخهٔ تولیدی:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run lint
+npm run build
+npm run preview
 ```
+
+آدرس توسعه معمولاً `http://localhost:5173` و پیش‌نمایش تولیدی معمولاً `http://localhost:4173` است. سرویس آفلاین فقط در نسخهٔ تولیدی ثبت می‌شود. نصب برنامه به HTTPS یا محیط محلی مرورگر نیاز دارد.
+
+## وضعیت پروژه
+
+این نسخه برای آزمایش و دریافت بازخورد اولیه آماده شده است. امکان همگام‌سازی بین دستگاه‌ها، حساب کاربری و ورود خودکار داده از CSV در آن وجود ندارد.
