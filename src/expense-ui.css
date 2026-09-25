@@ -1,0 +1,55 @@
+.expense-app {
+  --expense-border: #526071;
+  --expense-surface: #1d222b;
+  --expense-field: #171c24;
+  color: #f3f5f8;
+  background: #11161d;
+  font-family: Vazirmatn, sans-serif;
+  text-align: right;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+.expense-app *, .expense-app *::before, .expense-app *::after { box-sizing: border-box; }
+.expense-app h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1.4; margin: 0; color: inherit; }
+.expense-app h2 { color: inherit; margin: 0 0 16px; font-size: 1.2rem; }
+.expense-app .expense-subtitle { color: #b7c0cc; margin: 4px 0 24px; }
+.expense-app .expense-panel { background: var(--expense-surface); border: 1px solid var(--expense-border); border-radius: 14px; padding: clamp(16px, 3vw, 24px); margin-block: 24px; }
+.expense-app .expense-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.expense-app .expense-field { min-width: 0; }
+.expense-app .expense-field--wide { grid-column: 1 / -1; }
+.expense-app label { display: block; margin-bottom: 6px; font-weight: 600; color: #e2e8f0; }
+.expense-app input, .expense-app select, .expense-app textarea, .expense-app .expense-date-trigger, .expense-app .expense-range-trigger {
+  width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--expense-border); border-radius: 9px;
+  background: var(--expense-field); color: #f3f5f8; font: inherit; text-align: right;
+}
+.expense-app input::placeholder, .expense-app textarea::placeholder { color: #a8b2bf; }
+.expense-app textarea { resize: vertical; min-height: 88px; }
+.expense-app input:focus-visible, .expense-app select:focus-visible, .expense-app textarea:focus-visible, .expense-app button:focus-visible {
+  outline: 2px solid #f0b865; outline-offset: 2px;
+}
+.expense-app button { font: inherit; cursor: pointer; touch-action: manipulation; }
+.expense-app .expense-date-trigger { display: flex; align-items: center; justify-content: space-between; }
+.expense-app .expense-date-calendar { margin-top: 8px; width: fit-content; max-width: 100%; overflow-x: auto; }
+.expense-app .expense-form-actions, .expense-app .expense-filter-actions, .expense-app .expense-presets { display: flex; flex-wrap: wrap; gap: 10px; }
+.expense-app .expense-form-actions { margin-top: 20px; }
+.expense-app .expense-button { min-height: 44px; padding: 9px 16px; border: 1px solid var(--expense-border); border-radius: 9px; background: #28323e; color: #f3f5f8; }
+.expense-app .expense-button:hover { background: #364353; }
+.expense-app .expense-button--primary { background: #f0b865; color: #1b2028; border-color: #f0b865; font-weight: 700; }
+.expense-app .expense-button--primary:hover { background: #ffd08b; }
+.expense-app .expense-search { margin-block: 18px; }
+.expense-app .expense-filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.expense-app .expense-range { margin-top: 16px; }
+.expense-app .expense-range-trigger { height: auto; }
+.expense-app .expense-presets { margin-top: 14px; }
+.expense-app .expense-filter-actions { margin-top: 16px; }
+.expense-app .expense-filter-actions .expense-button { flex: 1 1 180px; }
+.expense-app hr { border: 0; border-top: 1px solid var(--expense-border); margin: 30px 0; }
+.expense-date-panel { max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow: auto; border-color: #526071; }
+
+@media (max-width: 640px) {
+  .expense-app .expense-fields, .expense-app .expense-filter-grid { grid-template-columns: minmax(0, 1fr); }
+  .expense-app .expense-form-actions .expense-button { flex: 1 1 100%; }
+  .expense-app .expense-presets .expense-button { flex: 1 1 auto; }
+}

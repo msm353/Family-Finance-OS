@@ -1,3 +1,4 @@
+import "../expense-ui.css";
 import { useEffect, useState } from "react";
 
 import ExpenseForm from "../components/ExpenseForm";
@@ -354,389 +355,64 @@ export default function Home() {
   );
 
   return (
-    <main
-      style={{
-        direction: "rtl",
-        maxWidth: "700px",
-        margin:
-          "40px auto",
-        padding: "20px",
-        fontFamily:
-          "Vazirmatn, sans-serif",
-      }}
-    >
-      <h1>
-        💰 Family Finance OS
-      </h1>
+    <main className="expense-app" dir="rtl">
+      <h1>💰 Family Finance OS</h1>
+      <p className="expense-subtitle">نسخه آزمایشی 0.1.0</p>
 
-      <p
-        style={{
-          color: "#666",
-          marginBottom:
-            "30px",
-        }}
-      >
-        نسخه آزمایشی 0.1.0
-      </p>
-
-      <ExpenseSummary
-        expenses={
-          filteredExpenses
-        }
-      />
-
-      <ExpenseSearch
-        value={searchText}
-        onSearch={
-          handleSearch
-        }
-      />
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-          marginBottom:
-            "12px",
-        }}
-      >
-        <div>
-          <label
-            htmlFor="category-filter"
-            style={{
-              display:
-                "block",
-              marginBottom:
-                "6px",
-              fontWeight:
-                "bold",
-            }}
-          >
-            🗂️ دسته‌بندی
-          </label>
-
-          <select
-            id="category-filter"
-            value={
-              selectedCategory
-            }
-            onChange={(e) =>
-              setSelectedCategory(
-                e.target.value
-              )
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              boxSizing:
-                "border-box",
-              borderRadius:
-                "8px",
-              border:
-                "1px solid #ddd",
-            }}
-          >
-            <option value="همه">
-              همه دسته‌بندی‌ها
-            </option>
-
-            {categories.map(
-              (category) => (
-                <option
-                  key={
-                    category
-                  }
-                  value={
-                    category
-                  }
-                >
-                  {category}
-                </option>
-              )
-            )}
-          </select>
+      <ExpenseSummary expenses={filteredExpenses} />
+      <section className="expense-panel" aria-labelledby="expense-filter-title">
+        <h2 id="expense-filter-title">فیلتر و جستجو</h2>
+        <ExpenseSearch value={searchText} onSearch={handleSearch} />
+        <div className="expense-filter-grid">
+          <div className="expense-field">
+            <label htmlFor="category-filter">🗂️ دسته‌بندی</label>
+            <select id="category-filter" value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}>
+              <option value="همه">همه دسته‌بندی‌ها</option>
+              {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+            </select>
+          </div>
+          <div className="expense-field">
+            <label htmlFor="payment-filter">💳 روش پرداخت</label>
+            <select id="payment-filter" value={selectedPaymentMethod}
+              onChange={(e) => setSelectedPaymentMethod(e.target.value)}>
+              <option value="همه">همه روش‌های پرداخت</option>
+              {paymentMethods.map((method) => <option key={method} value={method}>{method}</option>)}
+            </select>
+          </div>
+          <div className="expense-field">
+            <label htmlFor="sort-expenses">↕️ مرتب‌سازی</label>
+            <select id="sort-expenses" value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}>
+              <option value="newest">جدیدترین تاریخ</option>
+              <option value="oldest">قدیمی‌ترین تاریخ</option>
+              <option value="highest">بیشترین مبلغ</option>
+              <option value="lowest">کمترین مبلغ</option>
+            </select>
+          </div>
         </div>
-
-        <div>
-          <label
-            htmlFor="payment-filter"
-            style={{
-              display:
-                "block",
-              marginBottom:
-                "6px",
-              fontWeight:
-                "bold",
-            }}
-          >
-            💳 روش پرداخت
-          </label>
-
-          <select
-            id="payment-filter"
-            value={
-              selectedPaymentMethod
-            }
-            onChange={(e) =>
-              setSelectedPaymentMethod(
-                e.target.value
-              )
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              boxSizing:
-                "border-box",
-              borderRadius:
-                "8px",
-              border:
-                "1px solid #ddd",
-            }}
-          >
-            <option value="همه">
-              همه روش‌های پرداخت
-            </option>
-
-            {paymentMethods.map(
-              (method) => (
-                <option
-                  key={
-                    method
-                  }
-                  value={
-                    method
-                  }
-                >
-                  {method}
-                </option>
-              )
-            )}
-          </select>
+        <div className="expense-field expense-range">
+          <label>📅 بازه تاریخ</label>
+          <DateRangePicker value={dateRange} onChange={setDateRange} months={2}
+            placeholder="انتخاب بازه تاریخ" />
         </div>
-
-        <div>
-          <label
-            htmlFor="sort-expenses"
-            style={{
-              display:
-                "block",
-              marginBottom:
-                "6px",
-              fontWeight:
-                "bold",
-            }}
-          >
-            ↕️ مرتب‌سازی
-          </label>
-
-          <select
-            id="sort-expenses"
-            value={sortOption}
-            onChange={(e) =>
-              setSortOption(
-                e.target
-                  .value as SortOption
-              )
-            }
-            style={{
-              width: "100%",
-              padding: "12px",
-              boxSizing:
-                "border-box",
-              borderRadius:
-                "8px",
-              border:
-                "1px solid #ddd",
-            }}
-          >
-            <option value="newest">
-              جدیدترین تاریخ
-            </option>
-
-            <option value="oldest">
-              قدیمی‌ترین تاریخ
-            </option>
-
-            <option value="highest">
-              بیشترین مبلغ
-            </option>
-
-            <option value="lowest">
-              کمترین مبلغ
-            </option>
-          </select>
+        <div className="expense-presets">
+          <button className="expense-button" type="button" onClick={filterToday}>امروز</button>
+          <button className="expense-button" type="button" onClick={() => setQuickDateRange(7)}>۷ روز اخیر</button>
+          <button className="expense-button" type="button" onClick={() => setQuickDateRange(30)}>۳۰ روز اخیر</button>
         </div>
-      </div>
+        <div className="expense-filter-actions">
+          <button className="expense-button" type="button" onClick={clearFilters}>↩️ پاک کردن فیلترها</button>
+          <button className="expense-button" type="button" onClick={() => exportExpensesToCsv(sortedExpenses)}>📤 خروجی CSV</button>
+        </div>
+      </section>
 
-      <div
-        style={{
-          marginBottom:
-            "12px",
-        }}
-      >
-        <label
-          style={{
-            display:
-              "block",
-            marginBottom:
-              "6px",
-            fontWeight:
-              "bold",
-          }}
-        >
-          📅 بازه تاریخ
-        </label>
-
-        <DateRangePicker
-          value={dateRange}
-          onChange={
-            setDateRange
-          }
-          months={2}
-          placeholder="انتخاب بازه تاریخ"
-        />
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px",
-          marginBottom:
-            "12px",
-        }}
-      >
-        <button
-          type="button"
-          onClick={
-            filterToday
-          }
-          style={{
-            padding:
-              "10px 14px",
-            cursor:
-              "pointer",
-          }}
-        >
-          امروز
-        </button>
-
-        <button
-          type="button"
-          onClick={() =>
-            setQuickDateRange(
-              7
-            )
-          }
-          style={{
-            padding:
-              "10px 14px",
-            cursor:
-              "pointer",
-          }}
-        >
-          ۷ روز اخیر
-        </button>
-
-        <button
-          type="button"
-          onClick={() =>
-            setQuickDateRange(
-              30
-            )
-          }
-          style={{
-            padding:
-              "10px 14px",
-            cursor:
-              "pointer",
-          }}
-        >
-          ۳۰ روز اخیر
-        </button>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "10px",
-          marginBottom:
-            "20px",
-        }}
-      >
-        <button
-          type="button"
-          onClick={
-            clearFilters
-          }
-          style={{
-            padding: "10px",
-            cursor:
-              "pointer",
-          }}
-        >
-          ↩️ پاک کردن فیلترها
-        </button>
-
-        <button
-          type="button"
-          onClick={() =>
-            exportExpensesToCsv(
-              sortedExpenses
-            )
-          }
-          style={{
-            padding: "10px",
-            cursor:
-              "pointer",
-          }}
-        >
-          📤 خروجی CSV
-        </button>
-      </div>
-
-      <ExpenseForm
-        onExpenseAdded={
-          loadExpenses
-        }
-        editingExpense={
-          editingExpense
-        }
-        onFinishedEditing={
-          handleFinishedEditing
-        }
-      />
-
-      <ExpenseList
-        expenses={
-          sortedExpenses
-        }
-        onExpenseDeleted={
-          loadExpenses
-        }
-        onExpenseEdit={
-          handleEdit
-        }
-      />
-
-      <hr
-        style={{
-          margin:
-            "30px 0",
-        }}
-      />
-
-      <h2>
-        هدف پروژه
-      </h2>
-
-      <p>
-        سیستم مدیریت مالی خانوادگی کاملاً آفلاین
-      </p>
+      <ExpenseForm onExpenseAdded={loadExpenses} editingExpense={editingExpense}
+        onFinishedEditing={handleFinishedEditing} />
+      <ExpenseList expenses={sortedExpenses} onExpenseDeleted={loadExpenses} onExpenseEdit={handleEdit} />
+      <hr />
+      <h2>هدف پروژه</h2>
+      <p>سیستم مدیریت مالی خانوادگی کاملاً آفلاین</p>
     </main>
   );
 }

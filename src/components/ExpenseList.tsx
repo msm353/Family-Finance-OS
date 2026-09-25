@@ -56,7 +56,7 @@ export default function ExpenseList({
         style={{
           marginTop: "30px",
           padding: "20px",
-          border: "1px solid #ddd",
+          border: "1px solid #526071",
           borderRadius: "8px",
           textAlign: "center",
         }}
@@ -78,7 +78,7 @@ export default function ExpenseList({
         <div
           key={expense.id}
           style={{
-            border: "1px solid #ddd",
+            border: "1px solid #526071",
             borderRadius: "10px",
             padding: "16px",
             marginBottom: "12px",
@@ -128,7 +128,7 @@ export default function ExpenseList({
                 marginTop: "10px",
                 padding: "10px",
                 borderRadius: "6px",
-                background: "#f5f5f5",
+                background: "#28323e",
               }}
             >
               <strong>📝 توضیحات:</strong>{" "}
@@ -148,10 +148,7 @@ export default function ExpenseList({
               onClick={() =>
                 onExpenseEdit(expense)
               }
-              style={{
-                padding: "8px 14px",
-                cursor: "pointer",
-              }}
+              className="expense-button"
             >
               ✏️ ویرایش
             </button>
@@ -163,10 +160,7 @@ export default function ExpenseList({
                   handleDelete(expense.id);
                 }
               }}
-              style={{
-                padding: "8px 14px",
-                cursor: "pointer",
-              }}
+              className="expense-button"
             >
               🗑 حذف
             </button>

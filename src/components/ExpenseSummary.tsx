@@ -63,7 +63,7 @@ export default function ExpenseSummary({
       style={{
         marginTop: "20px",
         padding: "15px",
-        border: "1px solid #ddd",
+        border: "1px solid #526071",
         borderRadius: "8px",
       }}
     >
@@ -84,13 +84,13 @@ export default function ExpenseSummary({
         <div
           style={{
             padding: "12px",
-            border: "1px solid #eee",
+            border: "1px solid #526071",
             borderRadius: "8px",
           }}
         >
           <div
             style={{
-              color: "#666",
+              color: "#b7c0cc",
               marginBottom: "6px",
             }}
           >
@@ -111,13 +111,13 @@ export default function ExpenseSummary({
         <div
           style={{
             padding: "12px",
-            border: "1px solid #eee",
+            border: "1px solid #526071",
             borderRadius: "8px",
           }}
         >
           <div
             style={{
-              color: "#666",
+              color: "#b7c0cc",
               marginBottom: "6px",
             }}
           >
@@ -139,13 +139,13 @@ export default function ExpenseSummary({
         <div
           style={{
             padding: "12px",
-            border: "1px solid #eee",
+            border: "1px solid #526071",
             borderRadius: "8px",
           }}
         >
           <div
             style={{
-              color: "#666",
+              color: "#b7c0cc",
               marginBottom: "6px",
             }}
           >
@@ -167,13 +167,13 @@ export default function ExpenseSummary({
         <div
           style={{
             padding: "12px",
-            border: "1px solid #eee",
+            border: "1px solid #526071",
             borderRadius: "8px",
           }}
         >
           <div
             style={{
-              color: "#666",
+              color: "#b7c0cc",
               marginBottom: "6px",
             }}
           >
@@ -210,7 +210,7 @@ export default function ExpenseSummary({
                 style={{
                   padding: "12px 0",
                   borderBottom:
-                    "1px solid #eee",
+                    "1px solid #526071",
                 }}
               >
                 <div
@@ -240,7 +240,7 @@ export default function ExpenseSummary({
                     justifyContent:
                       "space-between",
                     gap: "12px",
-                    color: "#666",
+                    color: "#b7c0cc",
                     fontSize: "14px",
                   }}
                 >
@@ -266,7 +266,7 @@ export default function ExpenseSummary({
                   style={{
                     height: "6px",
                     marginTop: "8px",
-                    background: "#eee",
+                    background: "#364353",
                     borderRadius: "999px",
                     overflow: "hidden",
                   }}

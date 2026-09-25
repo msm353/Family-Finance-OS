@@ -14,25 +14,10 @@ export default function ExpenseSearch({
   }
 
   return (
-    <div
-      style={{
-        marginTop: "20px",
-        marginBottom: "20px",
-      }}
-    >
-      <input
-        type="text"
-        value={value}
-        onChange={handleChange}
-        placeholder="🔍 جستجو در هزینه‌ها..."
-        style={{
-          width: "100%",
-          padding: "12px",
-          boxSizing: "border-box",
-          borderRadius: "8px",
-          border: "1px solid #ddd",
-        }}
-      />
+    <div className="expense-search">
+      <label htmlFor="expense-search">جستجو در هزینه‌ها</label>
+      <input id="expense-search" type="search" value={value} onChange={handleChange}
+        placeholder="نام فروشگاه، دسته‌بندی یا توضیحات" />
     </div>
   );
 }

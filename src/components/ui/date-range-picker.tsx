@@ -236,7 +236,7 @@ export function DateRangePicker({ value, defaultValue = EMPTY, onChange, placeho
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-field border-line-field border-input bg-field shadow-field px-3 text-sm transition-colors",
+          "expense-range-trigger flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-field border-line-field border-input bg-field shadow-field px-3 text-sm transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
         )}
       >
@@ -250,7 +250,7 @@ export function DateRangePicker({ value, defaultValue = EMPTY, onChange, placeho
           </span>
         )}
       </button>
-      <FloatPortal open={open} mounted={mounted} style={style} theme={theme} panelRef={panel} role="dialog" className="fixed z-50 rounded-xl border border-border bg-card p-3 shadow-xl">
+      <FloatPortal open={open} mounted={mounted} style={style} theme={theme} panelRef={panel} role="dialog" className="expense-date-panel fixed z-50 rounded-xl border border-border bg-card p-3 shadow-xl">
           {presets.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-1.5">
               {presets.map((p) => (

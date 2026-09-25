@@ -346,316 +346,58 @@ export default function ExpenseForm({
     onExpenseAdded();
   }
 
-  const selectedDate =
-    parseStoredDate(date);
+  const selectedDate = parseStoredDate(date);
 
   return (
-    <div
-      style={{
-        marginTop: "20px",
-        padding: "20px",
-        border:
-          "1px solid #ddd",
-        borderRadius: "8px",
-      }}
-    >
-      <h2>
-        {editingExpense
-          ? "✏️ ویرایش هزینه"
-          : "➕ ثبت هزینه جدید"}
-      </h2>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label htmlFor="store-name">
-          نام فروشگاه
-        </label>
-
-        <input
-          id="store-name"
-          value={storeName}
-          onChange={(e) =>
-            setStoreName(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-          }}
-        />
+    <section className="expense-panel" aria-labelledby="expense-form-title">
+      <h2 id="expense-form-title">{editingExpense ? "✏️ ویرایش هزینه" : "➕ ثبت هزینه جدید"}</h2>
+      <div className="expense-fields">
+        <div className="expense-field">
+          <label htmlFor="store-name">نام فروشگاه</label>
+          <input id="store-name" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+        </div>
+        <div className="expense-field">
+          <label htmlFor="expense-amount">مبلغ (تومان)</label>
+          <input id="expense-amount" type="text" inputMode="numeric" autoComplete="off"
+            value={amount} onChange={handleAmountChange} placeholder="مثلاً 1,250,000"
+            dir="ltr" style={{ textAlign: "right" }} />
+        </div>
+        <div className="expense-field">
+          <label id="expense-date-label" htmlFor="expense-date">📅 تاریخ هزینه</label>
+          <button id="expense-date" className="expense-date-trigger" type="button"
+            aria-labelledby="expense-date-label expense-date" aria-expanded={isCalendarOpen}
+            onClick={() => setIsCalendarOpen((current) => !current)}>
+            {formatJalaliNumeric(selectedDate)}
+          </button>
+          {isCalendarOpen && <div className="expense-date-calendar">
+            <Calendar value={selectedDate} onChange={handleDateChange} />
+          </div>}
+        </div>
+        <div className="expense-field">
+          <label htmlFor="expense-category">دسته‌بندی</label>
+          <select id="expense-category" value={category} onChange={(e) => setCategory(e.target.value)}>
+            {categories.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </div>
+        <div className="expense-field">
+          <label htmlFor="payment-method">روش پرداخت</label>
+          <select id="payment-method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+            {paymentMethods.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </div>
+        <div className="expense-field expense-field--wide">
+          <label htmlFor="expense-description">توضیحات</label>
+          <textarea id="expense-description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
       </div>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label htmlFor="expense-amount">
-          مبلغ (تومان)
-        </label>
-
-        <input
-          id="expense-amount"
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          value={amount}
-          onChange={
-            handleAmountChange
-          }
-          placeholder="مثلاً 1,250,000"
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            direction: "ltr",
-            textAlign: "right",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-          }}
-        />
-      </div>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label>
-          📅 تاریخ هزینه
-        </label>
-
-        <button
-          type="button"
-          onClick={() =>
-            setIsCalendarOpen(
-              (current) =>
-                !current
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-            background:
-              "transparent",
-            cursor:
-              "pointer",
-            textAlign:
-              "right",
-            touchAction:
-              "manipulation",
-          }}
-        >
-          {formatJalaliNumeric(
-            selectedDate
-          )}
+      <div className="expense-form-actions">
+        <button className="expense-button expense-button--primary" type="button" onClick={handleSubmit}>
+          {editingExpense ? "ذخیره تغییرات" : "ثبت هزینه"}
         </button>
-
-        {isCalendarOpen && (
-          <div
-            style={{
-              marginTop:
-                "8px",
-            }}
-          >
-            <Calendar
-              value={
-                selectedDate
-              }
-              onChange={
-                handleDateChange
-              }
-            />
-          </div>
-        )}
+        {editingExpense && <button className="expense-button" type="button" onClick={() => {
+          clearForm(); onFinishedEditing();
+        }}>انصراف</button>}
       </div>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label htmlFor="expense-category">
-          دسته‌بندی
-        </label>
-
-        <select
-          id="expense-category"
-          value={category}
-          onChange={(e) =>
-            setCategory(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-          }}
-        >
-          {categories.map(
-            (item) => (
-              <option
-                key={item}
-                value={item}
-              >
-                {item}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label htmlFor="payment-method">
-          روش پرداخت
-        </label>
-
-        <select
-          id="payment-method"
-          value={
-            paymentMethod
-          }
-          onChange={(e) =>
-            setPaymentMethod(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-          }}
-        >
-          {paymentMethods.map(
-            (item) => (
-              <option
-                key={item}
-                value={item}
-              >
-                {item}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-
-      <div
-        style={{
-          marginBottom:
-            "15px",
-        }}
-      >
-        <label htmlFor="expense-description">
-          توضیحات
-        </label>
-
-        <textarea
-          id="expense-description"
-          value={
-            description
-          }
-          onChange={(e) =>
-            setDescription(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "5px",
-            boxSizing:
-              "border-box",
-            border:
-              "1px solid #ddd",
-            borderRadius:
-              "6px",
-          }}
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={
-          handleSubmit
-        }
-        style={{
-          width: "100%",
-          padding: "12px",
-          cursor: "pointer",
-          touchAction:
-            "manipulation",
-        }}
-      >
-        {editingExpense
-          ? "ذخیره تغییرات"
-          : "ثبت هزینه"}
-      </button>
-
-      {editingExpense && (
-        <button
-          type="button"
-          onClick={() => {
-            clearForm();
-            onFinishedEditing();
-          }}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginTop:
-              "10px",
-            cursor:
-              "pointer",
-            touchAction:
-              "manipulation",
-          }}
-        >
-          انصراف
-        </button>
-      )}
-    </div>
+    </section>
   );
 }
