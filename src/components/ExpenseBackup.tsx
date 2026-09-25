@@ -136,8 +136,9 @@ export default function ExpenseBackup({ currentCount, onRestored }: Props) {
       <div className="expense-backup-actions">
         <button className="expense-button" type="button" onClick={downloadBackup} disabled={busy}>دریافت فایل پشتیبان</button>
         <div className="expense-field">
-          <label htmlFor="expense-backup-file">انتخاب فایل پشتیبان JSON</label>
-          <input ref={inputRef} id="expense-backup-file" type="file" accept=".json,application/json" onChange={selectFile} disabled={busy} />
+          <span className="ffos-file-label">فایل پشتیبان JSON</span>
+          <input className="ffos-hidden-file" ref={inputRef} id="expense-backup-file" type="file" accept=".json,application/json" onChange={selectFile} disabled={busy} />
+          <label className="ffos-file-picker" htmlFor="expense-backup-file">{fileName || "انتخاب فایل از دستگاه"}</label>
         </div>
       </div>
       {selectedBackup && (

@@ -1,178 +1,46 @@
 @import "tailwindcss";
 @font-face {
-  font-family: "Vazirmatn";
+  font-family: Vazirmatn;
   src: url("./assets/Vazirmatn-variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
 }
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  font-family: Vazirmatn, Tahoma, sans-serif;
+  color: #14263a;
+  background: #f4f7f6;
+  color-scheme: light;
+  --background: #f4f7f6;
+  --foreground: #14263a;
+  --card: #fff;
+  --card-foreground: #14263a;
+  --popover: #fff;
+  --popover-foreground: #14263a;
+  --primary: #147e79;
+  --primary-foreground: #fff;
+  --secondary: #eaf4f1;
+  --secondary-foreground: #176b66;
+  --muted: #f2f5f5;
+  --muted-foreground: #657586;
+  --accent: #eaf4f1;
+  --accent-foreground: #176b66;
+  --destructive: #ba4545;
+  --border: #dbe5e5;
+  --input: #dbe5e5;
+  --ring: #17877e;
+  --brand: #17877e;
+  --brand-foreground: #fff;
+  --radius: .875rem;
+  --shape-field: .75rem;
+  --line-field: 1px;
+  --field: #fff;
+  --depth-field: none;
+  --font-vazirmatn: Vazirmatn;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-/* --- vibefarsi:theme-graphite --- */
-/* گرافیت، مینیمال فنی و تم پیش‌فرض. این بلوک را در :root بگذارید. */
-:root {
-  color-scheme: dark;
-
-  /* رنگ */
-  --background: oklch(0.115 0.002 285);
-  --foreground: oklch(0.975 0 0);
-  --card: oklch(0.14 0.002 285);
-  --card-foreground: oklch(0.975 0 0);
-  --popover: oklch(0.16 0.002 285);
-  --popover-foreground: oklch(0.975 0 0);
-  --primary: oklch(0.975 0 0);
-  --primary-foreground: oklch(0.13 0 0);
-  --secondary: oklch(0.2 0.002 285);
-  --secondary-foreground: oklch(0.975 0 0);
-  --muted: oklch(0.175 0.002 285);
-  --muted-foreground: oklch(0.63 0.004 285);
-  --accent: oklch(0.2 0.002 285);
-  --accent-foreground: oklch(0.975 0 0);
-  --destructive: oklch(0.65 0.2 25);
-  --success: oklch(0.75 0.16 160);
-  --warning: oklch(0.82 0.16 80);
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 11%);
-  --ring: oklch(0.7 0 0);
-  --brand: oklch(0.8 0.165 65);
-  --brand-foreground: oklch(0.22 0.06 60);
-
-  /* زبان طراحی: فونت، فرم، خط، عمق، حرکت و تراکم */
-  --radius: 0.625rem;
-  --type-display-weight: 700;
-  --shape-control: calc(var(--radius) - 2px);
-  --shape-field: calc(var(--radius) - 2px);
-  --shape-surface: calc(var(--radius) + 12px);
-  --shape-overlay: calc(var(--radius) + 4px);
-  --line: 1px;
-  --line-field: 1px;
-  --line-style: solid;
-  --field: color-mix(in oklch, var(--background) 60%, transparent);
-  --depth-control: 0 0 #0000;
-  --depth-press: 0 0 #0000;
-  --depth-field: 0 0 #0000;
-  --depth-surface: 0 1px 0 0 oklch(1 0 0 / 6%) inset;
-  --depth-overlay: 0 20px 50px -20px oklch(0 0 0 / 80%);
-  --surface-filter: none;
-  --press: scale(0.98);
-  --motion: 200ms;
-  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
-  --backdrop: none;
-  --spacing: 0.25rem;
-}
-/* --- vibefarsi:theme-graphite-end --- */
-
-/* --- vibefarsi:tailwind-map --- */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -189,32 +57,16 @@ code {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-field: var(--shape-field);
+  --font-sans: Vazirmatn, Tahoma, sans-serif;
 }
-
-@layer base {
-  body {
-    font-size: 16.5px;
-    line-height: 1.8;
-    letter-spacing: 0;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-  }
-}
-/* --- vibefarsi:tailwind-map-end --- */
-
-/* --- vibefarsi:font --- */
-@theme inline {
-  --font-sans: var(--font-vazirmatn), "IRANSans", "IRANSansX", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-}
-/* --- vibefarsi:font-end --- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .6; }
+#root { min-height: 100svh; }

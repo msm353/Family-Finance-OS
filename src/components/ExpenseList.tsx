@@ -1,172 +1,30 @@
+import { useState } from "react";
+import { CalendarDays, Pencil, Trash2 } from "lucide-react";
 import type { Expense } from "../models/Expense";
 import { deleteExpense } from "../services/expenseService";
 
-type ExpenseListProps = {
-  expenses: Expense[];
-  onExpenseDeleted: () => void;
-  onExpenseEdit: (expense: Expense) => void;
-};
-
-function formatExpenseDate(date: string) {
-  const match = date.match(
-    /^(\d{4})-(\d{2})-(\d{2})$/
-  );
-
-  if (!match) {
-    return date;
-  }
-
-  const [, year, month, day] = match;
-
-  const parsedDate = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  );
-
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(parsedDate);
+type Props = { expenses: Expense[]; compact?: boolean; onExpenseDeleted: () => void; onExpenseEdit: (expense: Expense) => void };
+function formatDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(year, month - 1, day));
 }
-
-export default function ExpenseList({
-  expenses,
-  onExpenseDeleted,
-  onExpenseEdit,
-}: ExpenseListProps) {
-  async function handleDelete(id: number) {
-    const ok = window.confirm(
-      "آیا از حذف این هزینه مطمئن هستید؟"
-    );
-
-    if (!ok) return;
-
-    await deleteExpense(id);
-
-    onExpenseDeleted();
-
-    alert("✅ هزینه حذف شد.");
+export default function ExpenseList({ expenses, compact = false, onExpenseDeleted, onExpenseEdit }: Props) {
+  const [error, setError] = useState("");
+  async function remove(id: number) {
+    if (!window.confirm("آیا از حذف این هزینه مطمئن هستید؟")) return;
+    try { await deleteExpense(id); setError(""); onExpenseDeleted(); }
+    catch { setError("حذف هزینه انجام نشد. دوباره تلاش کنید."); }
   }
-
-  if (expenses.length === 0) {
-    return (
-      <div
-        style={{
-          marginTop: "30px",
-          padding: "20px",
-          border: "1px solid #526071",
-          borderRadius: "8px",
-          textAlign: "center",
-        }}
-      >
-        <h2>هزینه‌های ثبت‌شده</h2>
-
-        <p>
-          هیچ هزینه‌ای برای نمایش وجود ندارد.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ marginTop: "30px" }}>
-      <h2>هزینه‌های ثبت‌شده</h2>
-
-      {expenses.map((expense) => (
-        <div
-          key={expense.id}
-          style={{
-            border: "1px solid #526071",
-            borderRadius: "10px",
-            padding: "16px",
-            marginBottom: "12px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "10px",
-              alignItems: "center",
-              marginBottom: "12px",
-            }}
-          >
-            <strong
-              style={{
-                fontSize: "18px",
-              }}
-            >
-              🏪 {expense.storeName}
-            </strong>
-
-            <strong>
-              {expense.amount.toLocaleString("fa-IR")}{" "}
-              تومان
-            </strong>
-          </div>
-
-          <div style={{ marginBottom: "6px" }}>
-            <strong>🏷 دسته‌بندی:</strong>{" "}
-            {expense.category}
-          </div>
-
-          <div style={{ marginBottom: "6px" }}>
-            <strong>💳 روش پرداخت:</strong>{" "}
-            {expense.paymentMethod}
-          </div>
-
-          <div style={{ marginBottom: "6px" }}>
-            <strong>📅 تاریخ:</strong>{" "}
-            {formatExpenseDate(expense.date)}
-          </div>
-
-          {expense.description?.trim() && (
-            <div
-              style={{
-                marginTop: "10px",
-                padding: "10px",
-                borderRadius: "6px",
-                background: "#28323e",
-              }}
-            >
-              <strong>📝 توضیحات:</strong>{" "}
-              {expense.description}
-            </div>
-          )}
-
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              marginTop: "14px",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() =>
-                onExpenseEdit(expense)
-              }
-              className="expense-button"
-            >
-              ✏️ ویرایش
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (expense.id !== undefined) {
-                  handleDelete(expense.id);
-                }
-              }}
-              className="expense-button"
-            >
-              🗑 حذف
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  if (expenses.length === 0) return <div className="ffos-empty-card"><span aria-hidden="true">✦</span><h3>هنوز هزینه‌ای برای نمایش نیست</h3><p>هزینه‌ای ثبت کنید یا فیلترها را تغییر دهید.</p></div>;
+  return <div className={`ffos-expense-list ${compact ? "is-compact" : ""}`}>
+    {error && <p className="ffos-error" role="alert">{error}</p>}
+    {expenses.map((expense) => <article className="ffos-expense-row" key={expense.id}>
+      <div className="ffos-expense-icon" aria-hidden="true">{expense.category.split(" ")[0]}</div>
+      <div className="ffos-expense-main"><strong>{expense.storeName}</strong><span>{expense.category.replace(/^\S+\s/, "")} · {expense.paymentMethod.replace(/^\S+\s/, "")}</span>
+        {!compact && expense.description?.trim() && <p className="ffos-expense-description">{expense.description}</p>}</div>
+      <div className="ffos-expense-meta"><strong>{expense.amount.toLocaleString("fa-IR")} <small>تومان</small></strong><span><CalendarDays size={13} /> {formatDate(expense.date)}</span></div>
+      {!compact && <div className="ffos-expense-actions"><button type="button" onClick={() => onExpenseEdit(expense)} aria-label={`ویرایش ${expense.storeName}`}><Pencil size={16} /> ویرایش</button>
+        <button type="button" className="is-danger" onClick={() => { if (expense.id !== undefined) void remove(expense.id); }} aria-label={`حذف ${expense.storeName}`}><Trash2 size={16} /> حذف</button></div>}
+    </article>)}
+  </div>;
 }

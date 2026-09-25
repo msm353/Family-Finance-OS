@@ -48,7 +48,8 @@ export function getMonthlyReport(expenses: Expense[]): MonthlyReport[] {
 
   if (totals.size === 0) return [];
 
-  const latestMonth = Math.max(...totals.keys());
+  const current = toJalali(new Date());
+  const latestMonth = current.jy * 12 + current.jm - 1;
   return Array.from({ length: 6 }, (_, offset) => {
     const monthKey = latestMonth - 5 + offset;
     const year = Math.floor(monthKey / 12);
