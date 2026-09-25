@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseBackup from "../components/ExpenseBackup";
 import ExpenseList from "../components/ExpenseList";
+import ExpenseReports from "../components/ExpenseReports";
 import ExpenseSearch from "../components/ExpenseSearch";
 import ExpenseSummary from "../components/ExpenseSummary";
 
@@ -417,6 +418,7 @@ export default function Home() {
         </div>
       </section>
 
+      <ExpenseReports expenses={filteredExpenses} />
       <ExpenseForm key={restoreGeneration} onExpenseAdded={loadExpenses} editingExpense={editingExpense}
         onFinishedEditing={handleFinishedEditing} />
       <ExpenseList expenses={sortedExpenses} onExpenseDeleted={loadExpenses} onExpenseEdit={handleEdit} />

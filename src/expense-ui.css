@@ -55,6 +55,17 @@
 .expense-app .expense-restore-preview { margin-top: 16px; padding: 16px; border: 1px solid #a8834b; border-radius: 9px; background: #30291e; }
 .expense-app .expense-restore-preview p { margin: 0 0 10px; }
 .expense-app .expense-backup-message { margin: 14px 0 0; color: #e8c891; }
+.expense-app .expense-report-sections { display: grid; gap: 28px; }
+.expense-app .expense-report-sections h3 { margin: 0; font-size: 1.05rem; }
+.expense-app .expense-report-caption { margin: 4px 0 12px; color: #b7c0cc; font-size: .9rem; }
+.expense-app .expense-report-empty { color: #b7c0cc; }
+.expense-app .expense-report-bars { display: grid; gap: 14px; margin-top: 14px; }
+.expense-app .expense-report-row { min-width: 0; }
+.expense-app .expense-report-row-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.expense-app .expense-report-row-heading span { font-variant-numeric: tabular-nums; }
+.expense-app .expense-report-track { height: 10px; margin: 6px 0 3px; border-radius: 999px; overflow: hidden; background: #364353; }
+.expense-app .expense-report-fill { height: 100%; border-radius: inherit; background: #f0b865; }
+.expense-app .expense-report-row small { color: #b7c0cc; }
 .expense-date-panel { max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow: auto; border-color: #526071; }
 
 @media (max-width: 640px) {
