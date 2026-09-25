@@ -36,6 +36,7 @@
 .expense-app .expense-form-actions { margin-top: 20px; }
 .expense-app .expense-button { min-height: 44px; padding: 9px 16px; border: 1px solid var(--expense-border); border-radius: 9px; background: #28323e; color: #f3f5f8; }
 .expense-app .expense-button:hover { background: #364353; }
+.expense-app .expense-button:disabled { opacity: .6; cursor: wait; }
 .expense-app .expense-button--primary { background: #f0b865; color: #1b2028; border-color: #f0b865; font-weight: 700; }
 .expense-app .expense-button--primary:hover { background: #ffd08b; }
 .expense-app .expense-search { margin-block: 18px; }
@@ -46,6 +47,14 @@
 .expense-app .expense-filter-actions { margin-top: 16px; }
 .expense-app .expense-filter-actions .expense-button { flex: 1 1 180px; }
 .expense-app hr { border: 0; border-top: 1px solid var(--expense-border); margin: 30px 0; }
+.expense-app .expense-help { color: #b7c0cc; margin: 0 0 16px; }
+.expense-app .expense-backup-actions { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; }
+.expense-app .expense-backup-actions > .expense-field { flex: 1 1 260px; }
+.expense-app .expense-backup-actions > .expense-button { flex: 1 1 180px; }
+.expense-app .expense-backup-actions input[type="file"] { height: auto; }
+.expense-app .expense-restore-preview { margin-top: 16px; padding: 16px; border: 1px solid #a8834b; border-radius: 9px; background: #30291e; }
+.expense-app .expense-restore-preview p { margin: 0 0 10px; }
+.expense-app .expense-backup-message { margin: 14px 0 0; color: #e8c891; }
 .expense-date-panel { max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow: auto; border-color: #526071; }
 
 @media (max-width: 640px) {

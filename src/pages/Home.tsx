@@ -2,6 +2,7 @@ import "../expense-ui.css";
 import { useEffect, useState } from "react";
 
 import ExpenseForm from "../components/ExpenseForm";
+import ExpenseBackup from "../components/ExpenseBackup";
 import ExpenseList from "../components/ExpenseList";
 import ExpenseSearch from "../components/ExpenseSearch";
 import ExpenseSummary from "../components/ExpenseSummary";
@@ -109,6 +110,8 @@ export default function Home() {
     Expense | undefined
   >(undefined);
 
+  const [restoreGeneration, setRestoreGeneration] = useState(0);
+
   const [
     searchText,
     setSearchText,
@@ -164,6 +167,13 @@ export default function Home() {
       undefined
     );
 
+    loadExpenses();
+  }
+
+  function handleRestored() {
+    setEditingExpense(undefined);
+    setRestoreGeneration((current) => current + 1);
+    clearFilters();
     loadExpenses();
   }
 
@@ -407,9 +417,10 @@ export default function Home() {
         </div>
       </section>
 
-      <ExpenseForm onExpenseAdded={loadExpenses} editingExpense={editingExpense}
+      <ExpenseForm key={restoreGeneration} onExpenseAdded={loadExpenses} editingExpense={editingExpense}
         onFinishedEditing={handleFinishedEditing} />
       <ExpenseList expenses={sortedExpenses} onExpenseDeleted={loadExpenses} onExpenseEdit={handleEdit} />
+      <ExpenseBackup currentCount={expenses.length} onRestored={handleRestored} />
       <hr />
       <h2>هدف پروژه</h2>
       <p>سیستم مدیریت مالی خانوادگی کاملاً آفلاین</p>
