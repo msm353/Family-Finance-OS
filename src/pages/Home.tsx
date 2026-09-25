@@ -5,6 +5,7 @@ import ExpenseForm from "../components/ExpenseForm";
 import ExpenseBackup from "../components/ExpenseBackup";
 import ExpenseList from "../components/ExpenseList";
 import ExpenseReports from "../components/ExpenseReports";
+import PwaStatus from "../components/PwaStatus";
 import ExpenseSearch from "../components/ExpenseSearch";
 import ExpenseSummary from "../components/ExpenseSummary";
 
@@ -369,6 +370,7 @@ export default function Home() {
     <main className="expense-app" dir="rtl">
       <h1>💰 Family Finance OS</h1>
       <p className="expense-subtitle">نسخه آزمایشی 0.1.0</p>
+      <PwaStatus />
 
       <ExpenseSummary expenses={filteredExpenses} />
       <section className="expense-panel" aria-labelledby="expense-filter-title">

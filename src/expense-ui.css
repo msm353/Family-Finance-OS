@@ -4,7 +4,7 @@
   --expense-field: #171c24;
   color: #f3f5f8;
   background: #11161d;
-  font-family: Vazirmatn, sans-serif;
+  font-family: Vazirmatn, Tahoma, sans-serif;
   text-align: right;
   width: min(100%, 760px);
   margin: 0 auto;
@@ -15,6 +15,7 @@
 .expense-app h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1.4; margin: 0; color: inherit; }
 .expense-app h2 { color: inherit; margin: 0 0 16px; font-size: 1.2rem; }
 .expense-app .expense-subtitle { color: #b7c0cc; margin: 4px 0 24px; }
+.expense-app .expense-pwa-status { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: -8px 0 20px; color: #e8c891; }
 .expense-app .expense-panel { background: var(--expense-surface); border: 1px solid var(--expense-border); border-radius: 14px; padding: clamp(16px, 3vw, 24px); margin-block: 24px; }
 .expense-app .expense-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .expense-app .expense-field { min-width: 0; }
