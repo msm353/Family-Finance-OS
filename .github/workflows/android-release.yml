@@ -40,5 +40,5 @@ jobs:
           gh release create "$tag" "$apk#FFOS-$tag.apk" \
             --target "$GITHUB_SHA" \
             --title "FFOS $tag (Android beta)" \
-            --notes-file docs/RELEASE-0.1.1-beta.md \
+            --notes-file docs/RELEASE-0.1.2-beta.md \
             --prerelease
