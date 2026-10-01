@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def releaseStorePath = System.getenv('FFOS_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('FFOS_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('FFOS_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('FFOS_KEY_PASSWORD')
+def hasReleaseSigning = releaseStorePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+
 android {
     namespace = "io.github.msm353.ffos"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +22,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseStorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

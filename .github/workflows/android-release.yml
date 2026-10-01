@@ -23,20 +23,46 @@ jobs:
           distribution: temurin
           java-version: '21'
       - run: npm ci
+      - run: npm test
       - run: npm run lint
       - run: npm run build
       - run: npx cap sync android
-      - name: Build installable APK
+      - name: Prepare release signing key
+        env:
+          FFOS_KEYSTORE_BASE64: ${{ secrets.FFOS_KEYSTORE_BASE64 }}
+          FFOS_KEYSTORE_PASSWORD: ${{ secrets.FFOS_KEYSTORE_PASSWORD }}
+          FFOS_KEY_ALIAS: ${{ secrets.FFOS_KEY_ALIAS }}
+          FFOS_KEY_PASSWORD: ${{ secrets.FFOS_KEY_PASSWORD }}
+        run: |
+          for variable in FFOS_KEYSTORE_BASE64 FFOS_KEYSTORE_PASSWORD FFOS_KEY_ALIAS FFOS_KEY_PASSWORD; do
+            if [ -z "${!variable}" ]; then
+              echo "Missing required Android signing secret: $variable" >&2
+              exit 1
+            fi
+          done
+          printf '%s' "$FFOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/ffos-release.jks"
+          echo "FFOS_KEYSTORE_PATH=$RUNNER_TEMP/ffos-release.jks" >> "$GITHUB_ENV"
+      - name: Build signed release APK
+        env:
+          FFOS_KEYSTORE_PASSWORD: ${{ secrets.FFOS_KEYSTORE_PASSWORD }}
+          FFOS_KEY_ALIAS: ${{ secrets.FFOS_KEY_ALIAS }}
+          FFOS_KEY_PASSWORD: ${{ secrets.FFOS_KEY_PASSWORD }}
         run: |
           chmod +x android/gradlew
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
+      - name: Verify APK signature
+        run: |
+          apk="android/app/build/outputs/apk/release/app-release.apk"
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -n "$apksigner"
+          "$apksigner" verify --verbose "$apk"
       - name: Publish APK on GitHub
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="v$(node -p "require('./package.json').version")"
-          apk="android/app/build/outputs/apk/debug/app-debug.apk"
+          apk="android/app/build/outputs/apk/release/app-release.apk"
           gh release create "$tag" "$apk#FFOS-$tag.apk" \
             --target "$GITHUB_SHA" \
             --title "FFOS $tag (Android beta)" \
