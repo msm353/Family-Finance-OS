@@ -1,0 +1,54 @@
+name: Android isolated test APK
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-apk:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[android-test]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Build isolated debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug -PffosTestBuild=true --no-daemon
+      - name: Verify signature and isolated application ID
+        shell: bash
+        run: |
+          apk="android/app/build/outputs/apk/debug/app-debug.apk"
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -n "$apksigner"
+          test -n "$aapt"
+          "$apksigner" verify --verbose "$apk"
+          package_info="$("$aapt" dump badging "$apk" | sed -n '1p')"
+          echo "$package_info"
+          [[ "$package_info" == "package: name='io.github.msm353.ffos.test'"* ]]
+      - name: Save test APK as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFOS-Test-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

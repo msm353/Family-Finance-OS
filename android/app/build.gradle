@@ -5,6 +5,7 @@ def releaseStorePassword = System.getenv('FFOS_KEYSTORE_PASSWORD')
 def releaseKeyAlias = System.getenv('FFOS_KEY_ALIAS')
 def releaseKeyPassword = System.getenv('FFOS_KEY_PASSWORD')
 def hasReleaseSigning = releaseStorePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+def isIsolatedTestBuild = project.findProperty('ffosTestBuild') == 'true'
 
 android {
     namespace = "io.github.msm353.ffos"
@@ -33,12 +34,23 @@ android {
         }
     }
     buildTypes {
+        debug {
+            if (isIsolatedTestBuild) {
+                applicationIdSuffix '.test'
+                versionNameSuffix '-test'
+            }
+        }
         release {
             if (hasReleaseSigning) {
                 signingConfig signingConfigs.release
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    if (isIsolatedTestBuild) {
+        sourceSets {
+            debug.res.srcDir 'src/isolatedTest/res'
         }
     }
 }

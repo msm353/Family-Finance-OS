@@ -16,3 +16,21 @@
 در گردش انتشار، keystore فقط روی runner موقت از secret بازسازی می‌شود، Gradle خروجی `assembleRelease` می‌سازد و امضای APK پیش از انتشار بررسی می‌شود. هیچ فایل کلید یا رمز نباید در Git، artifactهای عمومی یا خروجی دستورها قرار گیرد.
 
 راهنمای رسمی: [امضای برنامهٔ اندروید](https://developer.android.com/studio/publish/app-signing) و [نگهداری فایل دودویی در GitHub Actions secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets#storing-base64-binary-blobs-as-secrets).
+
+## APK جداگانه برای آزمون، بدون انتشار
+
+workflow جدید `.github/workflows/android-test.yml` با نام **Android isolated test APK** دستی یا با push روی `develop` و پیام آخرین commit دارای `[android-test]` اجرا می‌شود. pushهای عادی ساخت APK آزمایشی را اجرا نمی‌کنند. برای اجرای دستی، پس از ثبت فایل workflow در شاخهٔ پیش‌فرض مخزن، در GitHub Actions همین workflow را انتخاب و شاخهٔ `develop` را تعیین کنید. نتیجهٔ ساخت در صفحهٔ همان run و چک‌لیست آماده‌سازی ثبت می‌شود.
+
+این workflow ابتدا test، lint و build را اجرا می‌کند، دارایی‌های وب را به Android منتقل می‌کند و سپس `assembleDebug -PffosTestBuild=true` را می‌سازد. نتیجه فقط artifact هفت‌روزهٔ همان run است؛ tag یا GitHub Release ساخته نمی‌شود و secrets امضای release لازم نیستند. پس از ساخت، امضای APK و شناسهٔ `io.github.msm353.ffos.test` بررسی می‌شوند.
+
+فایل خروجی برنامهٔ **FFOS Test** است و کنار FFOS فعلی با فضای دادهٔ جدا نصب می‌شود. تغییر شناسه و نام فقط با گزینهٔ `ffosTestBuild=true` و در build نوع debug فعال است؛ شناسهٔ انتشار اصلی همان `io.github.msm353.ffos` باقی می‌ماند. نصب این APK آزمون ارتقای نسخهٔ اصلی با کلید ثابت را اثبات نمی‌کند. debug از کلید آزمایشی runner استفاده می‌کند؛ امضای ثابت بین دو run تضمین نمی‌شود، بنابراین آن را برای اطلاعات مالی واقعی استفاده نکنید.
+
+برای ساخت همین خروجی در محیط محلیِ دارای JDK 21 و Android SDK 36، پس از build وب و `npx cap sync android`، در پوشهٔ `android` اجرا کنید:
+
+```powershell
+.\gradlew.bat assembleDebug -PffosTestBuild=true --no-daemon
+```
+
+برای آزمون گوشی در FFOS Test، fixture ساختگی `tests/fixtures/backup-browser/legacy-v1.json` را بازیابی کنید، پشتیبان را خارج از Cache برنامه ذخیره و وجود فایل را بررسی کنید؛ ثبت آفلاین، بستن/بازکردن، لغو تأیید، بازیابی و انتقال فایل بین وب آزمایشی و APK را آزموده و نتیجه را در P7 ثبت کنید. نسخهٔ اصلی یا داده‌های آن را برای این آزمون حذف نکنید.
+
+مبنای جداسازی: [build variant و applicationIdSuffix در مستندات Android](https://developer.android.com/build/build-variants#application-id). نگهداری خروجی: [راهنمای رسمی upload-artifact](https://github.com/actions/upload-artifact).
