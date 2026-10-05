@@ -13,6 +13,10 @@ dist-ssr
 .sites-runtime/
 *.local
 
+# Android signing material must stay outside the repository.
+*.jks
+*.keystore
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
