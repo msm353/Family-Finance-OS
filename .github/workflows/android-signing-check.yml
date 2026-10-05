@@ -62,7 +62,7 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
-      - name: Verify APK certificate and application ID
+      - name: Verify APK certificate, application ID and upgrade version
         env:
           FFOS_SIGNING_CERT_SHA256: ${{ vars.FFOS_SIGNING_CERT_SHA256 }}
         shell: bash
@@ -80,6 +80,7 @@ jobs:
           package_info="$("$aapt" dump badging "$apk" | sed -n '1p')"
           echo "$package_info"
           [[ "$package_info" == "package: name='io.github.msm353.ffos'"* ]]
+          [[ "$package_info" == *" versionCode='4' "* ]]
       - name: Save signed APK for device checks
         uses: actions/upload-artifact@v4
         with:
