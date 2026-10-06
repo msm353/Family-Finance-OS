@@ -1,0 +1,153 @@
+{
+  "status": "proposed-contract",
+  "executionStatus": "not-implemented",
+  "validSnapshots": [
+    {
+      "file": "valid-core-v2.json",
+      "expectedBalancesByName": {
+        "A": 800000,
+        "B": 300000
+      },
+      "expectedExpenseMinor": 100000,
+      "expectedIncomeMinor": 200000
+    },
+    {
+      "file": "edited-transfer-v2.json",
+      "expectedBalancesByName": {
+        "A": 850000,
+        "B": 250000
+      },
+      "expectedExpenseMinor": 100000,
+      "expectedIncomeMinor": 200000
+    },
+    {
+      "file": "deleted-transfer-v2.json",
+      "expectedBalancesByName": {
+        "A": 1100000,
+        "B": 0
+      },
+      "expectedExpenseMinor": 100000,
+      "expectedIncomeMinor": 200000
+    },
+    {
+      "file": "restored-transfer-v2.json",
+      "expectedBalancesByName": {
+        "A": 850000,
+        "B": 250000
+      },
+      "expectedExpenseMinor": 100000,
+      "expectedIncomeMinor": 200000
+    },
+    {
+      "file": "expected-migrated-v2.json",
+      "expectedBalancesByName": {},
+      "expectedExpenseMinor": 250000,
+      "expectedIncomeMinor": 0
+    },
+    {
+      "file": "expected-resolved-v2.json",
+      "expectedBalancesByName": {},
+      "expectedExpenseMinor": 102,
+      "expectedIncomeMinor": 0
+    },
+    {
+      "file": "empty-v2.json",
+      "expectedBalancesByName": {},
+      "expectedExpenseMinor": 0,
+      "expectedIncomeMinor": 0
+    }
+  ],
+  "invalidSnapshots": [
+    {
+      "file": "invalid-account-reference-v2.json",
+      "expectedError": "MISSING_ACCOUNT"
+    },
+    {
+      "file": "unbalanced-transfer-v2.json",
+      "expectedError": "MOVEMENT_MISMATCH"
+    }
+  ],
+  "migrationCases": [
+    {
+      "id": "legacy-valid",
+      "input": "legacy-valid-v1.json",
+      "expected": "expected-migrated-v2.json",
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "legacy-blocked",
+      "input": "legacy-blocked-v1.json",
+      "expectedIssues": [
+        {
+          "expenseId": 7,
+          "code": "FRACTIONAL_TOMAN"
+        },
+        {
+          "expenseId": 8,
+          "code": "UNSAFE_AMOUNT"
+        }
+      ],
+      "expectedWrites": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "explicit-resolution",
+      "input": "legacy-blocked-v1.json",
+      "resolutions": "explicit-resolutions.json",
+      "expected": "expected-resolved-v2.json",
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "upgrade-first-insert-failure",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "upgrade-before-meta-failure",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "restore-after-first-table-failure",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "restore-cancel",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "source-changed-after-preflight",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "upgrade-blocked-by-tab",
+      "expectedWritesAfterFailure": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "migration-repeat",
+      "input": "expected-migrated-v2.json",
+      "expectedNewTransactions": 0,
+      "expectedNewHistory": 0,
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "source-conflict",
+      "expectedError": "LEGACY_SOURCE_CONFLICT",
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "safe-total-overflow",
+      "expectedError": "UNSAFE_TOTAL",
+      "executionStatus": "not-implemented"
+    },
+    {
+      "id": "cross-currency-first-slice",
+      "expectedError": "UNSUPPORTED_CROSS_CURRENCY",
+      "executionStatus": "not-implemented"
+    }
+  ]
+}

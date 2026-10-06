@@ -1,0 +1,386 @@
+{
+  "format": "ffos-financial",
+  "version": 2,
+  "schemaVersion": 2,
+  "exportedAt": "2026-10-05T12:00:00.000Z",
+  "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+  "migration": {
+    "version": "expenses-v1-to-financial-v2",
+    "completedAt": "2026-10-05T12:00:00.000Z"
+  },
+  "currencies": [
+    {
+      "id": "ffos:toman",
+      "name": "تومان",
+      "minorUnitDigits": 0
+    }
+  ],
+  "accounts": [],
+  "categories": [
+    {
+      "id": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+      "name": "خوراک",
+      "kind": "expense",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    },
+    {
+      "id": "19a1fabc-ff29-5dca-9e8e-ab505a3b5c97",
+      "name": "خرید",
+      "kind": "expense",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    }
+  ],
+  "counterparties": [
+    {
+      "id": "9bf19ee4-1407-59e8-9b27-7d81a860474f",
+      "name": "آزمون خوراک",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    },
+    {
+      "id": "99553c70-7e76-5e0f-9fff-09fb59a35e3c",
+      "name": "آزمون خرید",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    },
+    {
+      "id": "367b4275-8d77-5581-a76a-a8df6c057ed2",
+      "name": "آزمون تاریخ عربی",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    }
+  ],
+  "transactions": [
+    {
+      "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+      "type": "expense",
+      "date": "2024-03-20",
+      "title": "آزمون خوراک",
+      "categoryId": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+      "categoryNameSnapshot": "خوراک",
+      "counterpartyId": "9bf19ee4-1407-59e8-9b27-7d81a860474f",
+      "counterpartyNameSnapshot": "آزمون خوراک",
+      "paymentMethod": "کارت",
+      "description": null,
+      "confirmed": false,
+      "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+      "deletedAt": null,
+      "createdAt": "2024-03-20T10:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1,
+      "currencyId": "ffos:toman",
+      "amountMinor": 125000,
+      "accountId": null
+    },
+    {
+      "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+      "type": "expense",
+      "date": "2024-03-21",
+      "title": "آزمون خرید",
+      "categoryId": "19a1fabc-ff29-5dca-9e8e-ab505a3b5c97",
+      "categoryNameSnapshot": "خرید",
+      "counterpartyId": "99553c70-7e76-5e0f-9fff-09fb59a35e3c",
+      "counterpartyNameSnapshot": "آزمون خرید",
+      "paymentMethod": "نقدی",
+      "description": "داده ساختگی آزمون مرورگر",
+      "confirmed": true,
+      "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+      "deletedAt": null,
+      "createdAt": "2024-03-21T10:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1,
+      "currencyId": "ffos:toman",
+      "amountMinor": 75000,
+      "accountId": null
+    },
+    {
+      "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+      "type": "expense",
+      "date": "2024-03-22",
+      "title": "آزمون تاریخ عربی",
+      "categoryId": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+      "categoryNameSnapshot": "خوراک",
+      "counterpartyId": "367b4275-8d77-5581-a76a-a8df6c057ed2",
+      "counterpartyNameSnapshot": "آزمون تاریخ عربی",
+      "paymentMethod": "کارت",
+      "description": "",
+      "confirmed": true,
+      "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+      "deletedAt": null,
+      "createdAt": "2024-03-20T10:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1,
+      "currencyId": "ffos:toman",
+      "amountMinor": 50000,
+      "accountId": null
+    }
+  ],
+  "movements": [],
+  "history": [
+    {
+      "id": "3963fd50-7dff-5de4-b3ab-5190aba6fe40",
+      "entityType": "category",
+      "entityId": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+          "name": "خوراک",
+          "kind": "expense",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "a2bf2fdf-7b6f-5a20-ba6d-a078ba5a529c",
+      "entityType": "counterparty",
+      "entityId": "9bf19ee4-1407-59e8-9b27-7d81a860474f",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "9bf19ee4-1407-59e8-9b27-7d81a860474f",
+          "name": "آزمون خوراک",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "10040ccf-a2fd-5f82-a30b-8040f5f89b7d",
+      "entityType": "transaction",
+      "entityId": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+      "revision": 1,
+      "action": "migrate",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+          "type": "expense",
+          "date": "2024-03-20",
+          "title": "آزمون خوراک",
+          "categoryId": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+          "categoryNameSnapshot": "خوراک",
+          "counterpartyId": "9bf19ee4-1407-59e8-9b27-7d81a860474f",
+          "counterpartyNameSnapshot": "آزمون خوراک",
+          "paymentMethod": "کارت",
+          "description": null,
+          "confirmed": false,
+          "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+          "deletedAt": null,
+          "createdAt": "2024-03-20T10:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "currencyId": "ffos:toman",
+          "amountMinor": 125000,
+          "accountId": null
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "25df111a-c837-534c-bc85-21ebd7208b82",
+      "entityType": "category",
+      "entityId": "19a1fabc-ff29-5dca-9e8e-ab505a3b5c97",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "19a1fabc-ff29-5dca-9e8e-ab505a3b5c97",
+          "name": "خرید",
+          "kind": "expense",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "1b8c4b48-a7b3-58cb-9fea-72da1180e5d1",
+      "entityType": "counterparty",
+      "entityId": "99553c70-7e76-5e0f-9fff-09fb59a35e3c",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "99553c70-7e76-5e0f-9fff-09fb59a35e3c",
+          "name": "آزمون خرید",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "0a98fd25-baac-5279-9320-fed954ec62f8",
+      "entityType": "transaction",
+      "entityId": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+      "revision": 1,
+      "action": "migrate",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+          "type": "expense",
+          "date": "2024-03-21",
+          "title": "آزمون خرید",
+          "categoryId": "19a1fabc-ff29-5dca-9e8e-ab505a3b5c97",
+          "categoryNameSnapshot": "خرید",
+          "counterpartyId": "99553c70-7e76-5e0f-9fff-09fb59a35e3c",
+          "counterpartyNameSnapshot": "آزمون خرید",
+          "paymentMethod": "نقدی",
+          "description": "داده ساختگی آزمون مرورگر",
+          "confirmed": true,
+          "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+          "deletedAt": null,
+          "createdAt": "2024-03-21T10:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "currencyId": "ffos:toman",
+          "amountMinor": 75000,
+          "accountId": null
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "57a4edc8-1349-59d1-a039-8663688a1ef5",
+      "entityType": "counterparty",
+      "entityId": "367b4275-8d77-5581-a76a-a8df6c057ed2",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "367b4275-8d77-5581-a76a-a8df6c057ed2",
+          "name": "آزمون تاریخ عربی",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "5fde0cec-6e4e-5ecf-b552-025f1965975d",
+      "entityType": "transaction",
+      "entityId": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+      "revision": 1,
+      "action": "migrate",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+          "type": "expense",
+          "date": "2024-03-22",
+          "title": "آزمون تاریخ عربی",
+          "categoryId": "f3837922-9f22-5e98-a1cd-548ea0172fef",
+          "categoryNameSnapshot": "خوراک",
+          "counterpartyId": "367b4275-8d77-5581-a76a-a8df6c057ed2",
+          "counterpartyNameSnapshot": "آزمون تاریخ عربی",
+          "paymentMethod": "کارت",
+          "description": "",
+          "confirmed": true,
+          "sourceLegacyKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+          "deletedAt": null,
+          "createdAt": "2024-03-20T10:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "currencyId": "ffos:toman",
+          "amountMinor": 50000,
+          "accountId": null
+        },
+        "movements": []
+      }
+    }
+  ],
+  "legacyExpenses": [
+    {
+      "sourceKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:7",
+      "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+      "expenseId": 7,
+      "original": {
+        "category": "خوراک",
+        "id": 7,
+        "createdAt": "2024-03-20T10:00:00.000Z",
+        "storeName": "آزمون خوراک",
+        "amount": 125000,
+        "paymentMethod": "کارت",
+        "date": "۱۴۰۳/۱/۱",
+        "confirmed": false
+      },
+      "resolution": null
+    },
+    {
+      "sourceKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:8",
+      "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+      "expenseId": 8,
+      "original": {
+        "confirmed": true,
+        "description": "داده ساختگی آزمون مرورگر",
+        "category": "خرید",
+        "date": "2024-03-21",
+        "storeName": "آزمون خرید",
+        "amount": 75000,
+        "paymentMethod": "نقدی",
+        "id": 8,
+        "createdAt": "2024-03-21T10:00:00.000Z"
+      },
+      "resolution": null
+    },
+    {
+      "sourceKey": "legacy:d2b1a98f-4999-5c76-bc46-16ad41d11198:9",
+      "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+      "expenseId": 9,
+      "original": {
+        "category": "خوراک",
+        "id": 9,
+        "createdAt": "2024-03-20T10:00:00.000Z",
+        "storeName": "آزمون تاریخ عربی",
+        "amount": 50000,
+        "paymentMethod": "کارت",
+        "date": "١٤٠٣/٠١/٠٣",
+        "confirmed": true,
+        "description": ""
+      },
+      "resolution": null
+    }
+  ]
+}

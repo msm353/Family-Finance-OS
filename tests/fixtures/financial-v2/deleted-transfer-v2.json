@@ -1,0 +1,546 @@
+{
+  "format": "ffos-financial",
+  "version": 2,
+  "schemaVersion": 2,
+  "exportedAt": "2026-10-05T12:00:03.000Z",
+  "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+  "migration": null,
+  "currencies": [
+    {
+      "id": "ffos:toman",
+      "name": "تومان",
+      "minorUnitDigits": 0
+    }
+  ],
+  "accounts": [
+    {
+      "id": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "name": "A",
+      "type": "bank",
+      "currencyId": "ffos:toman",
+      "openingBalanceMinor": 1000000,
+      "openingDate": "2024-03-20",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    },
+    {
+      "id": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+      "name": "B",
+      "type": "bank",
+      "currencyId": "ffos:toman",
+      "openingBalanceMinor": 0,
+      "openingDate": "2024-03-20",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    }
+  ],
+  "categories": [
+    {
+      "id": "6e8979b8-c5de-5665-95a8-e91005ec609c",
+      "name": "خوراک",
+      "kind": "expense",
+      "archivedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1
+    }
+  ],
+  "counterparties": [],
+  "transactions": [
+    {
+      "id": "0d215900-3e24-5568-a39f-c753f6eca2c5",
+      "type": "expense",
+      "date": "2024-03-20",
+      "title": "هزینهٔ ساختگی",
+      "categoryId": "6e8979b8-c5de-5665-95a8-e91005ec609c",
+      "categoryNameSnapshot": "خوراک",
+      "counterpartyId": null,
+      "counterpartyNameSnapshot": null,
+      "paymentMethod": null,
+      "description": null,
+      "confirmed": true,
+      "sourceLegacyKey": null,
+      "deletedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1,
+      "currencyId": "ffos:toman",
+      "amountMinor": 100000,
+      "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03"
+    },
+    {
+      "id": "c6dfa729-df74-5aaf-bd99-c4811ad89606",
+      "type": "income",
+      "date": "2024-03-20",
+      "title": "درآمد ساختگی",
+      "categoryId": null,
+      "categoryNameSnapshot": null,
+      "counterpartyId": null,
+      "counterpartyNameSnapshot": null,
+      "paymentMethod": null,
+      "description": null,
+      "confirmed": true,
+      "sourceLegacyKey": null,
+      "deletedAt": null,
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:00.000Z",
+      "revision": 1,
+      "currencyId": "ffos:toman",
+      "amountMinor": 200000,
+      "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03"
+    },
+    {
+      "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "type": "transfer",
+      "date": "2024-03-20",
+      "title": "انتقال ساختگی",
+      "categoryId": null,
+      "categoryNameSnapshot": null,
+      "counterpartyId": null,
+      "counterpartyNameSnapshot": null,
+      "paymentMethod": null,
+      "description": null,
+      "confirmed": true,
+      "sourceLegacyKey": null,
+      "deletedAt": "2026-10-05T12:00:03.000Z",
+      "createdAt": "2026-10-05T12:00:00.000Z",
+      "updatedAt": "2026-10-05T12:00:03.000Z",
+      "revision": 3,
+      "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+      "fromCurrencyId": "ffos:toman",
+      "toCurrencyId": "ffos:toman",
+      "fromAmountMinor": 250000,
+      "toAmountMinor": 250000,
+      "exchangeRate": null
+    }
+  ],
+  "movements": [
+    {
+      "id": "0e849890-c5f5-58cd-8982-474b36d0a2d2",
+      "transactionId": "0d215900-3e24-5568-a39f-c753f6eca2c5",
+      "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "currencyId": "ffos:toman",
+      "deltaMinor": -100000
+    },
+    {
+      "id": "6b649323-b592-527f-8116-e74fc6228dd5",
+      "transactionId": "c6dfa729-df74-5aaf-bd99-c4811ad89606",
+      "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "currencyId": "ffos:toman",
+      "deltaMinor": 200000
+    },
+    {
+      "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+      "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "currencyId": "ffos:toman",
+      "deltaMinor": -250000
+    },
+    {
+      "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+      "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+      "currencyId": "ffos:toman",
+      "deltaMinor": 250000
+    }
+  ],
+  "history": [
+    {
+      "id": "b014f55c-5000-54db-b7fa-92de2778f119",
+      "entityType": "account",
+      "entityId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "name": "A",
+          "type": "bank",
+          "currencyId": "ffos:toman",
+          "openingBalanceMinor": 1000000,
+          "openingDate": "2024-03-20",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "0d586142-0dee-555c-bb36-9a8cf831bedd",
+      "entityType": "account",
+      "entityId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "name": "B",
+          "type": "bank",
+          "currencyId": "ffos:toman",
+          "openingBalanceMinor": 0,
+          "openingDate": "2024-03-20",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "aeecb8bc-8b04-5a5c-817e-91a23ae1f256",
+      "entityType": "category",
+      "entityId": "6e8979b8-c5de-5665-95a8-e91005ec609c",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "6e8979b8-c5de-5665-95a8-e91005ec609c",
+          "name": "خوراک",
+          "kind": "expense",
+          "archivedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1
+        },
+        "movements": []
+      }
+    },
+    {
+      "id": "cacf0f1c-93b4-5d2d-9e2a-09728985b40d",
+      "entityType": "transaction",
+      "entityId": "0d215900-3e24-5568-a39f-c753f6eca2c5",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "0d215900-3e24-5568-a39f-c753f6eca2c5",
+          "type": "expense",
+          "date": "2024-03-20",
+          "title": "هزینهٔ ساختگی",
+          "categoryId": "6e8979b8-c5de-5665-95a8-e91005ec609c",
+          "categoryNameSnapshot": "خوراک",
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "currencyId": "ffos:toman",
+          "amountMinor": 100000,
+          "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03"
+        },
+        "movements": [
+          {
+            "id": "0e849890-c5f5-58cd-8982-474b36d0a2d2",
+            "transactionId": "0d215900-3e24-5568-a39f-c753f6eca2c5",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -100000
+          }
+        ]
+      }
+    },
+    {
+      "id": "d572976a-5b6c-51e3-88f8-6772a2810792",
+      "entityType": "transaction",
+      "entityId": "c6dfa729-df74-5aaf-bd99-c4811ad89606",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "c6dfa729-df74-5aaf-bd99-c4811ad89606",
+          "type": "income",
+          "date": "2024-03-20",
+          "title": "درآمد ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "currencyId": "ffos:toman",
+          "amountMinor": 200000,
+          "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03"
+        },
+        "movements": [
+          {
+            "id": "6b649323-b592-527f-8116-e74fc6228dd5",
+            "transactionId": "c6dfa729-df74-5aaf-bd99-c4811ad89606",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 200000
+          }
+        ]
+      }
+    },
+    {
+      "id": "fce2cd56-646d-5213-882c-9e191d74a46b",
+      "entityType": "transaction",
+      "entityId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "revision": 1,
+      "action": "create",
+      "occurredAt": "2026-10-05T12:00:00.000Z",
+      "before": null,
+      "after": {
+        "record": {
+          "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+          "type": "transfer",
+          "date": "2024-03-20",
+          "title": "انتقال ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "fromCurrencyId": "ffos:toman",
+          "toCurrencyId": "ffos:toman",
+          "fromAmountMinor": 300000,
+          "toAmountMinor": 300000,
+          "exchangeRate": null
+        },
+        "movements": [
+          {
+            "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -300000
+          },
+          {
+            "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 300000
+          }
+        ]
+      }
+    },
+    {
+      "id": "4e0575be-72a4-5f98-aee3-9d37b255c728",
+      "entityType": "transaction",
+      "entityId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "revision": 2,
+      "action": "update",
+      "occurredAt": "2026-10-05T12:00:02.000Z",
+      "before": {
+        "record": {
+          "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+          "type": "transfer",
+          "date": "2024-03-20",
+          "title": "انتقال ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:00.000Z",
+          "revision": 1,
+          "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "fromCurrencyId": "ffos:toman",
+          "toCurrencyId": "ffos:toman",
+          "fromAmountMinor": 300000,
+          "toAmountMinor": 300000,
+          "exchangeRate": null
+        },
+        "movements": [
+          {
+            "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -300000
+          },
+          {
+            "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 300000
+          }
+        ]
+      },
+      "after": {
+        "record": {
+          "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+          "type": "transfer",
+          "date": "2024-03-20",
+          "title": "انتقال ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:02.000Z",
+          "revision": 2,
+          "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "fromCurrencyId": "ffos:toman",
+          "toCurrencyId": "ffos:toman",
+          "fromAmountMinor": 250000,
+          "toAmountMinor": 250000,
+          "exchangeRate": null
+        },
+        "movements": [
+          {
+            "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -250000
+          },
+          {
+            "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 250000
+          }
+        ]
+      }
+    },
+    {
+      "id": "8199dc47-28b2-5611-8320-328f7a0042aa",
+      "entityType": "transaction",
+      "entityId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+      "revision": 3,
+      "action": "delete",
+      "occurredAt": "2026-10-05T12:00:03.000Z",
+      "before": {
+        "record": {
+          "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+          "type": "transfer",
+          "date": "2024-03-20",
+          "title": "انتقال ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": null,
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:02.000Z",
+          "revision": 2,
+          "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "fromCurrencyId": "ffos:toman",
+          "toCurrencyId": "ffos:toman",
+          "fromAmountMinor": 250000,
+          "toAmountMinor": 250000,
+          "exchangeRate": null
+        },
+        "movements": [
+          {
+            "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -250000
+          },
+          {
+            "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 250000
+          }
+        ]
+      },
+      "after": {
+        "record": {
+          "id": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+          "type": "transfer",
+          "date": "2024-03-20",
+          "title": "انتقال ساختگی",
+          "categoryId": null,
+          "categoryNameSnapshot": null,
+          "counterpartyId": null,
+          "counterpartyNameSnapshot": null,
+          "paymentMethod": null,
+          "description": null,
+          "confirmed": true,
+          "sourceLegacyKey": null,
+          "deletedAt": "2026-10-05T12:00:03.000Z",
+          "createdAt": "2026-10-05T12:00:00.000Z",
+          "updatedAt": "2026-10-05T12:00:03.000Z",
+          "revision": 3,
+          "fromAccountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+          "toAccountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+          "fromCurrencyId": "ffos:toman",
+          "toCurrencyId": "ffos:toman",
+          "fromAmountMinor": 250000,
+          "toAmountMinor": 250000,
+          "exchangeRate": null
+        },
+        "movements": [
+          {
+            "id": "769f9c6d-fa7d-560e-a7d9-ebd4d8257704",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "fc065eb9-5ed4-5372-bcb0-9857f1187e03",
+            "currencyId": "ffos:toman",
+            "deltaMinor": -250000
+          },
+          {
+            "id": "e6371a4d-d17f-5db5-af6d-cb284dc3f8d8",
+            "transactionId": "ff7241ae-96eb-5289-9b70-66c3542ab831",
+            "accountId": "ddfcb85f-b628-5fd9-ba45-c256b511570e",
+            "currencyId": "ffos:toman",
+            "deltaMinor": 250000
+          }
+        ]
+      }
+    }
+  ],
+  "legacyExpenses": []
+}

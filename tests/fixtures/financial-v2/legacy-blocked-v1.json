@@ -1,0 +1,28 @@
+{
+  "exportedAt": "2026-10-02T12:00:00.000Z",
+  "format": "ffos-expenses",
+  "version": 1,
+  "expenses": [
+    {
+      "category": "خوراک",
+      "id": 7,
+      "createdAt": "2024-03-20T10:00:00.000Z",
+      "storeName": "آزمون خوراک",
+      "amount": 1.5,
+      "paymentMethod": "کارت",
+      "date": "۱۴۰۳/۱/۱",
+      "confirmed": false
+    },
+    {
+      "confirmed": true,
+      "description": "مبلغ خارج از محدودهٔ صحیح امن؛ فقط آزمون",
+      "category": "خرید",
+      "date": "2024-03-21",
+      "storeName": "آزمون خرید",
+      "amount": 9007199254740992,
+      "paymentMethod": "نقدی",
+      "id": 8,
+      "createdAt": "2024-03-21T10:00:00.000Z"
+    }
+  ]
+}

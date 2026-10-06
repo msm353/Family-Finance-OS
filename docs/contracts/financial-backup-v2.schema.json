@@ -1,0 +1,1358 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FFOS financial backup v2 proposed structural contract",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "ffos-financial"
+    },
+    "version": {
+      "const": 2
+    },
+    "schemaVersion": {
+      "const": 2
+    },
+    "exportedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "datasetId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+    },
+    "migration": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/migration"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "currencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/currency"
+      },
+      "minItems": 1
+    },
+    "accounts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/account"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/category"
+      }
+    },
+    "counterparties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/counterparty"
+      }
+    },
+    "transactions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/transaction"
+      }
+    },
+    "movements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/movement"
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/history"
+      }
+    },
+    "legacyExpenses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/legacyExpense"
+      }
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "schemaVersion",
+    "exportedAt",
+    "datasetId",
+    "migration",
+    "currencies",
+    "accounts",
+    "categories",
+    "counterparties",
+    "transactions",
+    "movements",
+    "history",
+    "legacyExpenses"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "currency": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "minorUnitDigits": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "minorUnitDigits"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "id": {
+            "const": "ffos:toman"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "name": {
+            "const": "تومان"
+          },
+          "minorUnitDigits": {
+            "const": 0
+          }
+        }
+      }
+    },
+    "account": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "type": {
+          "enum": [
+            "bank",
+            "cash",
+            "wallet"
+          ]
+        },
+        "currencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "openingBalanceMinor": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "openingDate": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "archivedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "currencyId",
+        "openingBalanceMinor",
+        "openingDate",
+        "archivedAt",
+        "createdAt",
+        "updatedAt",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "enum": [
+            "expense",
+            "income",
+            "both"
+          ]
+        },
+        "archivedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "archivedAt",
+        "createdAt",
+        "updatedAt",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "counterparty": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "archivedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "archivedAt",
+        "createdAt",
+        "updatedAt",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "expense": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "categoryId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "categoryNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paymentMethod": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "sourceLegacyKey": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deletedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "const": "expense"
+        },
+        "currencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "amountMinor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "accountId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "title",
+        "categoryId",
+        "categoryNameSnapshot",
+        "counterpartyId",
+        "counterpartyNameSnapshot",
+        "paymentMethod",
+        "description",
+        "confirmed",
+        "sourceLegacyKey",
+        "deletedAt",
+        "createdAt",
+        "updatedAt",
+        "revision",
+        "type",
+        "currencyId",
+        "amountMinor",
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "income": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "categoryId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "categoryNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paymentMethod": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "sourceLegacyKey": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deletedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "const": "income"
+        },
+        "currencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "amountMinor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "title",
+        "categoryId",
+        "categoryNameSnapshot",
+        "counterpartyId",
+        "counterpartyNameSnapshot",
+        "paymentMethod",
+        "description",
+        "confirmed",
+        "sourceLegacyKey",
+        "deletedAt",
+        "createdAt",
+        "updatedAt",
+        "revision",
+        "type",
+        "currencyId",
+        "amountMinor",
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "adjustment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "categoryId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "categoryNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paymentMethod": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "sourceLegacyKey": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deletedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "const": "adjustment"
+        },
+        "currencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "amountMinor": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991,
+          "not": {
+            "const": 0
+          }
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "title",
+        "categoryId",
+        "categoryNameSnapshot",
+        "counterpartyId",
+        "counterpartyNameSnapshot",
+        "paymentMethod",
+        "description",
+        "confirmed",
+        "sourceLegacyKey",
+        "deletedAt",
+        "createdAt",
+        "updatedAt",
+        "revision",
+        "type",
+        "currencyId",
+        "amountMinor",
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "transfer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "categoryId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "categoryNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterpartyNameSnapshot": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paymentMethod": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "sourceLegacyKey": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deletedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "const": "transfer"
+        },
+        "fromAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "toAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "fromCurrencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "toCurrencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "fromAmountMinor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "toAmountMinor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "exchangeRate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "numerator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "denominator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "numerator",
+                "denominator"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "title",
+        "categoryId",
+        "categoryNameSnapshot",
+        "counterpartyId",
+        "counterpartyNameSnapshot",
+        "paymentMethod",
+        "description",
+        "confirmed",
+        "sourceLegacyKey",
+        "deletedAt",
+        "createdAt",
+        "updatedAt",
+        "revision",
+        "type",
+        "fromAccountId",
+        "toAccountId",
+        "fromCurrencyId",
+        "toCurrencyId",
+        "fromAmountMinor",
+        "toAmountMinor",
+        "exchangeRate"
+      ],
+      "additionalProperties": false
+    },
+    "transaction": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/expense"
+        },
+        {
+          "$ref": "#/definitions/income"
+        },
+        {
+          "$ref": "#/definitions/transfer"
+        },
+        {
+          "$ref": "#/definitions/adjustment"
+        }
+      ]
+    },
+    "movement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "transactionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "currencyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "deltaMinor": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991,
+          "not": {
+            "const": 0
+          }
+        }
+      },
+      "required": [
+        "id",
+        "transactionId",
+        "accountId",
+        "currencyId",
+        "deltaMinor"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/transaction"
+            },
+            {
+              "$ref": "#/definitions/account"
+            },
+            {
+              "$ref": "#/definitions/category"
+            },
+            {
+              "$ref": "#/definitions/counterparty"
+            }
+          ]
+        },
+        "movements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/movement"
+          }
+        }
+      },
+      "required": [
+        "record",
+        "movements"
+      ],
+      "additionalProperties": false
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "entityType": {
+          "enum": [
+            "account",
+            "transaction",
+            "category",
+            "counterparty"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "enum": [
+            "create",
+            "migrate",
+            "update",
+            "delete",
+            "restore",
+            "archive",
+            "unarchive",
+            "opening-change"
+          ]
+        },
+        "occurredAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/snapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "$ref": "#/definitions/snapshot"
+        }
+      },
+      "required": [
+        "id",
+        "entityType",
+        "entityId",
+        "revision",
+        "action",
+        "occurredAt",
+        "before",
+        "after"
+      ],
+      "additionalProperties": false
+    },
+    "legacyOriginal": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "storeName": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "description": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "storeName",
+        "amount",
+        "category",
+        "paymentMethod",
+        "date",
+        "createdAt",
+        "confirmed"
+      ],
+      "additionalProperties": true
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "amountMinor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "approvedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        }
+      },
+      "required": [
+        "reason",
+        "approvedAt"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "amountMinor"
+          ]
+        },
+        {
+          "required": [
+            "date"
+          ]
+        }
+      ]
+    },
+    "legacyExpense": {
+      "type": "object",
+      "properties": {
+        "sourceKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "datasetId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+        },
+        "expenseId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "original": {
+          "$ref": "#/definitions/legacyOriginal"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/resolution"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sourceKey",
+        "datasetId",
+        "expenseId",
+        "original",
+        "resolution"
+      ],
+      "additionalProperties": false
+    },
+    "migration": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "expenses-v1-to-financial-v2"
+        },
+        "completedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        }
+      },
+      "required": [
+        "version",
+        "completedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

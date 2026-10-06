@@ -1,0 +1,22 @@
+{
+  "format": "ffos-financial",
+  "version": 2,
+  "schemaVersion": 2,
+  "exportedAt": "2026-10-05T12:00:00.000Z",
+  "datasetId": "d2b1a98f-4999-5c76-bc46-16ad41d11198",
+  "migration": null,
+  "currencies": [
+    {
+      "id": "ffos:toman",
+      "name": "تومان",
+      "minorUnitDigits": 0
+    }
+  ],
+  "accounts": [],
+  "categories": [],
+  "counterparties": [],
+  "transactions": [],
+  "movements": [],
+  "history": [],
+  "legacyExpenses": []
+}
