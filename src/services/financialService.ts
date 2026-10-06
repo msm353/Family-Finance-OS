@@ -235,8 +235,10 @@ export async function saveFinancialTransaction(
       throw new Error("حساب فعال انتخاب کنید.");
     if (!accountId && !(old?.sourceLegacyKey && input.type === "expense"))
       throw new Error("ابتدا حساب بسازید و آن را انتخاب کنید.");
-    let categoryId: string | null = null;
-    let categoryNameSnapshot: string | null = null;
+    let categoryId: string | null =
+      input.type === "income" ? (old?.categoryId ?? null) : null;
+    let categoryNameSnapshot: string | null =
+      input.type === "income" ? (old?.categoryNameSnapshot ?? null) : null;
     if (input.type === "expense") {
       if (!input.categoryName?.trim()) throw new Error("دستهٔ هزینه لازم است.");
       let category = data.categories.find(
@@ -287,7 +289,11 @@ export async function saveFinancialTransaction(
       counterpartyId,
       counterpartyNameSnapshot,
       paymentMethod:
-        input.type === "transfer" ? null : input.paymentMethod || null,
+        input.type === "transfer"
+          ? null
+          : input.paymentMethod === undefined
+            ? (old?.paymentMethod ?? null)
+            : input.paymentMethod || null,
       description: input.description ?? null,
       confirmed: input.confirmed ?? old?.confirmed ?? true,
       sourceLegacyKey: old?.sourceLegacyKey ?? null,

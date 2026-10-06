@@ -10,6 +10,7 @@ import {
   safeTotal,
 } from "../src/lib/financialContract.ts";
 import {
+  appendCreation,
   migrateLegacyExpenses,
   MigrationBlocked,
 } from "../src/lib/financialMigration.ts";
@@ -664,7 +665,10 @@ test("account workspace and existing expense form render the connected controls 
     }),
   );
   assert.ok(form.includes("حساب پرداخت"));
-  assert.ok(form.includes('value="" selected=""'), "legacy editing does not silently assign the first account");
+  assert.ok(
+    form.includes('value="" selected=""'),
+    "legacy editing does not silently assign the first account",
+  );
   assert.ok(form.includes("هزینهٔ قدیمی بدون حساب"));
   assert.ok(form.includes("۱۲۵") || form.includes("125,000"));
 });
@@ -677,4 +681,53 @@ test("currency display separates units and preserves exact fractional digits at 
   );
   assert.equal(formatCurrencyAmount(data, "USD", -1), "−۰٫۰۱ دلار");
   assert.equal(formatCurrencyAmount(data, "ffos:toman", 100), "۱۰۰ تومان");
+});
+
+test("editing imported income retains its optional category and payment method", async () => {
+  const db = await fresh();
+  const data = fixture("valid-core-v2.json");
+  const income = data.transactions.find((tx) => tx.type === "income");
+  const category = {
+    id: crypto.randomUUID(),
+    name: "حقوق",
+    kind: "income",
+    archivedAt: null,
+    createdAt: income.createdAt,
+    updatedAt: income.createdAt,
+    revision: 1,
+  };
+  data.categories.push(category);
+  appendCreation(data, "category", category);
+  income.categoryId = category.id;
+  income.categoryNameSnapshot = category.name;
+  income.paymentMethod = "کارت";
+  const initial = data.history.find((e) => e.entityId === income.id);
+  initial.after.record = structuredClone(income);
+  await restoreFinancialBackup(data, db);
+  await saveFinancialTransaction(
+    {
+      id: income.id,
+      revision: income.revision,
+      type: "income",
+      date: income.date,
+      title: income.title,
+      amountMinor: 123,
+      accountId: income.accountId,
+    },
+    db,
+  );
+  const edited = (await getFinancialSnapshot(db)).transactions.find(
+    (tx) => tx.id === income.id,
+  );
+  assert.equal(edited.categoryId, category.id);
+  assert.equal(edited.categoryNameSnapshot, "حقوق");
+  assert.equal(edited.paymentMethod, "کارت");
+});
+test("dates outside the supported calendar stop legacy migration and v2 parsing explicitly", () => {
+  const legacy = fixture("legacy-valid-v1.json").expenses;
+  legacy[0].date = "9999-01-01";
+  assert.throws(() => migrateLegacyExpenses(legacy), MigrationBlocked);
+  const data = fixture("valid-core-v2.json");
+  data.transactions[0].date = "9999-01-01";
+  assert.throws(() => validateFinancialSnapshot(data), /تاریخ/);
 });

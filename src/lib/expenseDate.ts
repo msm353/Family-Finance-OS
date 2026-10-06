@@ -1,4 +1,4 @@
-import { jalaliMonthLength, toGregorian } from "./jalali.ts";
+import { jalaliMonthLength, toGregorian, toJalali } from "./jalali.ts";
 
 function toEnglishDigits(value: string) {
   return value
@@ -19,9 +19,18 @@ export function normalizeExpenseDate(value: string): string | null {
     const month = Number(iso[2]);
     const day = Number(iso[3]);
     const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() + 1 === month && date.getDate() === day
-      ? dateKey(date)
-      : null;
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() + 1 !== month ||
+      date.getDate() !== day
+    )
+      return null;
+    try {
+      toJalali(date);
+      return dateKey(date);
+    } catch {
+      return null;
+    }
   }
 
   const legacy = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(normalized);
@@ -31,7 +40,13 @@ export function normalizeExpenseDate(value: string): string | null {
   const month = Number(legacy[2]);
   const day = Number(legacy[3]);
   try {
-    if (month < 1 || month > 12 || day < 1 || day > jalaliMonthLength(year, month)) return null;
+    if (
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      day > jalaliMonthLength(year, month)
+    )
+      return null;
     return dateKey(toGregorian(year, month, day));
   } catch {
     return null;
