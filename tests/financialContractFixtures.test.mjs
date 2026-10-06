@@ -126,7 +126,10 @@ test("migration examples preserve raw records and show explicit correction rathe
   }
 });
 
-test("the contract manifest does not claim any actual v2 execution has passed", () => {
-  assert.equal(manifest.executionStatus, "not-implemented");
-  for (const scenario of manifest.migrationCases) assert.equal(scenario.executionStatus, "not-implemented");
+test("the contract manifest separates automated database evidence from pending device and UI checks", () => {
+  assert.equal(manifest.executionStatus, "automated-database-passed-device-pending");
+  for (const scenario of manifest.migrationCases) {
+    assert.equal(scenario.executionStatus, scenario.id === "restore-cancel" ? "manual-ui-pending" : "passed-fake-indexeddb");
+    if(scenario.id !== "restore-cancel") assert.equal(scenario.evidence,"tests/financialDatabase.test.mjs");
+  }
 });

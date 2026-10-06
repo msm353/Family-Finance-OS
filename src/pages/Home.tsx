@@ -12,11 +12,18 @@ import { categories } from "../constants/categories";
 import { paymentMethods } from "../constants/paymentMethods";
 import { JALALI_MONTHS, jalaliMonthLength, toGregorian, toJalali } from "../lib/jalali";
 import type { Expense } from "../models/Expense";
-import { getExpenses } from "../services/expenseService";
+import FinancialWorkspace from "../components/FinancialWorkspace";
+import MigrationRecovery from "../components/MigrationRecovery";
+import { getFinancialSnapshot } from "../services/financialService";
+import { formatCurrencyAmount } from "../lib/financialDisplay";
+import { accountBalance, safeTotal } from "../lib/financialContract";
+import { localDay } from "../lib/moneyInput";
+import type { FinancialSnapshot } from "../models/Financial";
+import { expensesFromSnapshot } from "../services/expenseService";
 import { getMonthlyReport } from "../utils/expenseReports";
 import { exportExpensesToCsv } from "../utils/exportExpensesToCsv";
 
-type Page = "home" | "expenses" | "reports" | "backup" | "form";
+type Page = "home" | "expenses" | "reports" | "backup" | "form" | "accounts";
 type SortOption = "newest" | "oldest" | "highest" | "lowest";
 const featuredCategories = ["همه", "🍔 خوراک", "🛒 خرید", "🏠 خانه"];
 const money = (amount: number) => amount.toLocaleString("fa-IR");
@@ -56,11 +63,15 @@ export default function Home() {
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [dateRange, setDateRange] = useState<DateRange>({ from: null, to: null });
   const [feedback, setFeedback] = useState("");
-  async function loadExpenses() { setExpenses(await getExpenses()); }
+  const [financial,setFinancial] = useState<FinancialSnapshot|null>(null);
+  const [loadError,setLoadError] = useState('');
+  async function loadExpenses() {try {const data=await getFinancialSnapshot();setFinancial(data);setExpenses(expensesFromSnapshot(data));setLoadError('');}catch(error){setLoadError(error instanceof Error?error.message:'بارگذاری انجام نشد.');}}
   useEffect(() => {
-    let active = true;
-    getExpenses().then((data) => { if (active) setExpenses(data); }).catch((error) => console.error("بارگذاری هزینه‌ها انجام نشد.", error));
-    return () => { active = false; };
+    let active=true;
+    const blocked = ()=>setLoadError("برای ارتقا، پنجره‌های دیگر FFOS را ببندید و دوباره تلاش کنید. داده‌ها هنوز تغییر نکرده‌اند.");
+    window.addEventListener("ffos-upgrade-blocked",blocked);
+    getFinancialSnapshot().then(data=>{if(active){setFinancial(data);setExpenses(expensesFromSnapshot(data));setLoadError('');}}).catch(error=>{if(active)setLoadError(error instanceof Error?error.message:'بارگذاری انجام نشد.');});
+    return ()=>{active=false;window.removeEventListener("ffos-upgrade-blocked",blocked);};
   }, []);
   function navigate(next: Page) {
     setPage(next);
@@ -93,6 +104,8 @@ export default function Home() {
     setDateRange({ from: start, to: today });
   }
   const comparison = monthComparison(expenses, new Date());
+  const currentMonth=toJalali(new Date());
+  const incomeThisMonth=safeTotal((financial?.transactions ?? []).filter(tx=>{const month=monthOf(tx.date);return tx.type==='income' && tx.currencyId==='ffos:toman' && !tx.deletedAt && tx.date<=localDay() && month?.jy===currentMonth.jy && month?.jm===currentMonth.jm;}).map(tx=>'amountMinor' in tx?tx.amountMinor:0));
   const percent = comparison.previous > 0 ? Math.round((comparison.current - comparison.previous) / comparison.previous * 100) : null;
   const from = dateRange.from ? dateKey(dateRange.from) : "";
   const to = dateRange.to ? dateKey(dateRange.to) : "";
@@ -105,7 +118,7 @@ export default function Home() {
   const sorted = [...filtered].sort((a, b) => {
     if (sortOption === "highest") return b.amount - a.amount;
     if (sortOption === "lowest") return a.amount - b.amount;
-    const order = a.date.localeCompare(b.date) || (a.id ?? 0) - (b.id ?? 0);
+    const order = a.date.localeCompare(b.date) || a.createdAt.localeCompare(b.createdAt) || String(a.id).localeCompare(String(b.id));
     return sortOption === "oldest" ? order : -order;
   });
   const monthly = getMonthlyReport(expenses);
@@ -114,6 +127,8 @@ export default function Home() {
     <button key={item} type="button" className={`ffos-chip ${selectedCategory === item ? "is-active" : ""}`}
       onClick={() => setSelectedCategory(item)}>{item === "همه" ? item : item.replace(/^\S+\s/, "")}</button>)}</div>;
   const search = <div className="ffos-search-wrap"><Search size={19} /><ExpenseSearch value={searchText} onSearch={setSearchText} /></div>;
+  if(loadError) return <MigrationRecovery error={loadError} onRecovered={loadExpenses} />;
+  if(!financial) return <main className="ffos-app" dir="rtl"><p role="status">در حال بارگذاری داده‌ها…</p></main>;
   return <main className="ffos-app" dir="rtl"><div className="ffos-shell">
     {page === "home" && <>
       <header className="ffos-header"><div><p className="ffos-eyebrow">FFOS · فضای مالی شما</p><h1>امور مالی خانواده</h1><p className="ffos-muted">{comparison.label} · با آرامش از هزینه‌ها باخبر باشید</p></div><span className="ffos-header-mark" aria-hidden="true"><Wallet size={27} /></span></header>
@@ -122,6 +137,7 @@ export default function Home() {
         {percent === null ? <p className="ffos-comparison">برای مقایسه، هزینه‌ای در همین بازه از ماه قبل ندارید.</p>
           : <p className={`ffos-comparison ${percent > 0 ? "is-up" : "is-down"}`}>{percent > 0 ? <ArrowUpLeft size={18} /> : <ArrowDownLeft size={18} />}<strong>{money(Math.abs(percent))}٪ {percent > 0 ? "بیشتر" : percent < 0 ? "کمتر" : "بدون تغییر"}</strong><span>از همین بازه در ماه گذشته</span></p>}
       </div><span className="ffos-hero-icon" aria-hidden="true"><Wallet size={40} /></span></section>
+      <section className="ffos-section"><div className="ffos-section-title"><h2>موجودی حساب‌ها تا امروز</h2><button className="ffos-text-button" onClick={()=>navigate('accounts')}>مدیریت حساب‌ها</button></div><div className="ffos-card"><p>درآمد این ماه تا امروز: {money(incomeThisMonth)} تومان</p>{financial.accounts.filter(a=>!a.archivedAt).map(a=><p key={a.id}>{a.name}: {a.openingDate>localDay()?'تاریخ آغاز حساب هنوز نرسیده':formatCurrencyAmount(financial,a.currencyId,accountBalance(financial,a.id,localDay()))}</p>)}{!financial.accounts.some(a=>!a.archivedAt) && <p>برای ثبت درآمد و پرداخت‌های جدید، اولین حساب خود را بسازید.</p>}</div></section>
       <button className="ffos-primary ffos-add" type="button" onClick={() => openForm()}><Plus size={22} /> ثبت هزینه</button>
       <section className="ffos-section"><div className="ffos-section-title"><div><span className="ffos-kicker">آنچه تازه ثبت شده</span><h2>هزینه‌های اخیر</h2></div><button className="ffos-text-button" type="button" onClick={() => navigate("expenses")}>مشاهده همه <ChevronLeft size={17} /></button></div>
         {search}{categoryChips}<ExpenseList expenses={sorted.slice(0, 3)} compact onExpenseDeleted={loadExpenses} onExpenseEdit={openForm} /></section>
@@ -129,7 +145,7 @@ export default function Home() {
         <div className="ffos-card ffos-mini-chart">{!monthly.some((item) => item.amount > 0) ? <p className="ffos-empty">پس از ثبت هزینه در شش ماه اخیر، نمودار اینجا نمایش داده می‌شود.</p>
           : monthly.map((item) => <div className="ffos-mini-bar" key={item.monthKey} title={`${item.label}: ${money(item.amount)} تومان`}><div className="ffos-mini-bar-area"><span style={{ height: `${Math.max(item.amount ? 12 : 3, item.amount / monthlyMax * 100)}%` }} /></div><small>{item.label.split(" ")[0]}</small></div>)}</div></section>
     </>}
-    {page === "form" && <><PageHeader title={editingExpense ? "ویرایش هزینه" : "ثبت هزینه"} subtitle="جزئیات هزینه را وارد کنید" onBack={() => navigate(formReturn)} /><ExpenseForm key={formGeneration} editingExpense={editingExpense} onSaved={afterSave} onCancel={() => navigate(formReturn)} /></>}
+    {page === "form" && <><PageHeader title={editingExpense ? "ویرایش هزینه" : "ثبت هزینه"} subtitle="جزئیات هزینه را وارد کنید" onBack={() => navigate(formReturn)} /><ExpenseForm key={formGeneration} editingExpense={editingExpense} accounts={financial.accounts.filter(a=>a.currencyId==="ffos:toman")} onSaved={afterSave} onCancel={() => navigate(formReturn)} /></>}
     {page === "expenses" && <><PageHeader title="هزینه‌ها" subtitle="مرور، جستجو و مدیریت هزینه‌های ثبت‌شده" />
       <button className="ffos-primary ffos-page-action" type="button" onClick={() => openForm()}><Plus size={20} /> ثبت هزینه</button>
       <div className="ffos-card ffos-filter-panel">{search}{categoryChips}<div className="ffos-filter-grid">
@@ -141,9 +157,11 @@ export default function Home() {
       <div className="ffos-section-title"><div><span className="ffos-kicker">{money(sorted.length)} مورد</span><h2>فهرست هزینه‌ها</h2></div><button className="ffos-text-button" type="button" onClick={() => exportExpensesToCsv(sorted)}><Download size={17} /> خروجی CSV</button></div>
       <ExpenseList expenses={sorted} onExpenseDeleted={loadExpenses} onExpenseEdit={openForm} /></>}
     {page === "reports" && <><PageHeader title="گزارش هزینه‌ها" subtitle="الگوی هزینه‌ها را در یک نگاه ببینید" /><ExpenseReports expenses={expenses} /></>}
-    {page === "backup" && <><PageHeader title="پشتیبان و داده‌ها" subtitle="هزینه‌ها روی همین دستگاه نگهداری می‌شوند" /><div className="ffos-backup-intro"><ShieldCheck size={24} /><p>برای جابه‌جایی داده‌ها یا نگهداری نسخهٔ امن، فایل پشتیبان JSON بگیرید.</p></div><ExpenseBackup currentCount={expenses.length} onRestored={afterRestore} /></>}
+    {page === "accounts" && <><PageHeader title="حساب‌ها و تراکنش‌ها" subtitle="موجودی، درآمد و انتقال بین حساب‌ها" /><FinancialWorkspace data={financial} onChanged={loadExpenses} onExpenseEdit={tx=>openForm(expenses.find(e=>e.id===tx.id))} /></>}
+    {page === "backup" && <><PageHeader title="پشتیبان و داده‌ها" subtitle="هزینه‌ها روی همین دستگاه نگهداری می‌شوند" /><div className="ffos-backup-intro"><ShieldCheck size={24} /><p>برای جابه‌جایی داده‌ها یا نگهداری نسخهٔ امن، فایل پشتیبان JSON بگیرید.</p></div><ExpenseBackup currentCount={financial.transactions.filter(tx=>tx.type==="expense" && !tx.deletedAt).length} onRestored={afterRestore} /></>}
   </div>{page !== "form" && <nav className="ffos-bottom-nav" aria-label="بخش‌های برنامه">
     <NavButton icon={<HomeIcon size={21} />} label="خانه" active={page === "home"} onClick={() => navigate("home")} />
+    <NavButton icon={<Wallet size={21} />} label="حساب‌ها" active={page === "accounts"} onClick={() => navigate("accounts")} />
     <NavButton icon={<List size={21} />} label="هزینه‌ها" active={page === "expenses"} onClick={() => navigate("expenses")} />
     <NavButton icon={<ChartNoAxesColumn size={21} />} label="گزارش‌ها" active={page === "reports"} onClick={() => navigate("reports")} />
     <NavButton icon={<ShieldCheck size={21} />} label="پشتیبان" active={page === "backup"} onClick={() => navigate("backup")} />

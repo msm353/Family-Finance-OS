@@ -1,6 +1,6 @@
 {
-  "status": "proposed-contract",
-  "executionStatus": "not-implemented",
+  "status": "implemented-first-slice",
+  "executionStatus": "automated-database-passed-device-pending",
   "validSnapshots": [
     {
       "file": "valid-core-v2.json",
@@ -72,7 +72,8 @@
       "id": "legacy-valid",
       "input": "legacy-valid-v1.json",
       "expected": "expected-migrated-v2.json",
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "legacy-blocked",
@@ -88,66 +89,77 @@
         }
       ],
       "expectedWrites": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "explicit-resolution",
       "input": "legacy-blocked-v1.json",
       "resolutions": "explicit-resolutions.json",
       "expected": "expected-resolved-v2.json",
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "upgrade-first-insert-failure",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "upgrade-before-meta-failure",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "restore-after-first-table-failure",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "restore-cancel",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "manual-ui-pending"
     },
     {
       "id": "source-changed-after-preflight",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "upgrade-blocked-by-tab",
       "expectedWritesAfterFailure": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "migration-repeat",
       "input": "expected-migrated-v2.json",
       "expectedNewTransactions": 0,
       "expectedNewHistory": 0,
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "source-conflict",
       "expectedError": "LEGACY_SOURCE_CONFLICT",
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "safe-total-overflow",
       "expectedError": "UNSAFE_TOTAL",
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     },
     {
       "id": "cross-currency-first-slice",
       "expectedError": "UNSUPPORTED_CROSS_CURRENCY",
-      "executionStatus": "not-implemented"
+      "executionStatus": "passed-fake-indexeddb",
+      "evidence": "tests/financialDatabase.test.mjs"
     }
   ]
 }

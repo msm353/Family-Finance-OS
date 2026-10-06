@@ -1,5 +1,8 @@
 export interface Expense {
-  id?: number;
+  id?: number | string;
+  accountId?: string | null;
+  revision?: number;
+  sourceLegacyKey?: string | null;
 
   storeName: string;
 

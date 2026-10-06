@@ -80,7 +80,9 @@ jobs:
           package_info="$("$aapt" dump badging "$apk" | sed -n '1p')"
           echo "$package_info"
           [[ "$package_info" == "package: name='io.github.msm353.ffos'"* ]]
-          [[ "$package_info" == *" versionCode='4' "* ]]
+          [[ "$package_info" == *" versionCode='5' "* ]]
+          version="$(node -p "require('./package.json').version")"
+          [[ "$package_info" == *" versionName='$version' "* ]]
       - name: Save signed APK for device checks
         uses: actions/upload-artifact@v4
         with:

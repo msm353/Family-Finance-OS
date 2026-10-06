@@ -5,19 +5,11 @@ import { addExpense, updateExpense } from "../services/expenseService";
 import { categories } from "../constants/categories";
 import { paymentMethods } from "../constants/paymentMethods";
 import { formatJalaliNumeric } from "../lib/jalali";
+import { formatMoneyInput as formatAmount, parseMoneyInput } from "../lib/moneyInput";
+import type { Account } from "../models/Financial";
 import type { Expense } from "../models/Expense";
 
-type Props = { editingExpense?: Expense; onSaved: () => void; onCancel: () => void };
-const persian = "۰۱۲۳۴۵۶۷۸۹";
-const arabic = "٠١٢٣٤٥٦٧٨٩";
-function normalizeDigits(value: string) {
-  return value.replace(/[۰-۹]/g, (digit) => String(persian.indexOf(digit)))
-    .replace(/[٠-٩]/g, (digit) => String(arabic.indexOf(digit)));
-}
-function formatAmount(value: string) {
-  const digits = normalizeDigits(value).replace(/\D/g, "");
-  return digits ? Number(digits).toLocaleString("en-US") : "";
-}
+type Props = { accounts: Account[]; editingExpense?: Expense; onSaved: () => void; onCancel: () => void };
 function dateKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -26,7 +18,7 @@ function dateValue(value?: string) {
   const [year, month, day] = value.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
-export default function ExpenseForm({ editingExpense, onSaved, onCancel }: Props) {
+export default function ExpenseForm({ accounts, editingExpense, onSaved, onCancel }: Props) {
   const [amount, setAmount] = useState(editingExpense ? formatAmount(String(editingExpense.amount)) : "");
   const [storeName, setStoreName] = useState(editingExpense?.storeName ?? "");
   const [category, setCategory] = useState(editingExpense?.category ?? categories[0]);
@@ -34,12 +26,14 @@ export default function ExpenseForm({ editingExpense, onSaved, onCancel }: Props
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(editingExpense?.paymentMethod ?? paymentMethods[0]);
   const [description, setDescription] = useState(editingExpense?.description ?? "");
+  const [accountId, setAccountId] = useState(editingExpense ? editingExpense.accountId ?? "" : accounts.find(a => !a.archivedAt)?.id ?? "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
-    const numericAmount = Number(amount.replace(/,/g, ""));
+    let numericAmount: number;
+    try { numericAmount = parseMoneyInput(amount); } catch (error) { setError((error as Error).message); return; }
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) { setError("مبلغ معتبر وارد کنید."); return; }
     if (!storeName.trim()) { setError("نام فروشگاه یا محل هزینه را وارد کنید."); return; }
     setError(""); setSaving(true);
@@ -47,14 +41,15 @@ export default function ExpenseForm({ editingExpense, onSaved, onCancel }: Props
       ...(editingExpense?.id === undefined ? {} : { id: editingExpense.id }),
       storeName: storeName.trim(), amount: numericAmount, category, paymentMethod,
       description: description.trim(), date: dateKey(date),
-      createdAt: editingExpense?.createdAt ?? new Date().toISOString(), confirmed: true,
+      accountId: accountId || null, revision: editingExpense?.revision, sourceLegacyKey: editingExpense?.sourceLegacyKey,
+      createdAt: editingExpense?.createdAt ?? new Date().toISOString(), confirmed: editingExpense?.confirmed ?? true,
     };
     try {
       if (editingExpense) await updateExpense(expense);
       else await addExpense(expense);
       onSaved();
-    } catch {
-      setError("ذخیره هزینه انجام نشد. دوباره تلاش کنید.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "ذخیره هزینه انجام نشد.");
     } finally {
       setSaving(false);
     }
@@ -64,11 +59,12 @@ export default function ExpenseForm({ editingExpense, onSaved, onCancel }: Props
   return <form className="ffos-form" onSubmit={save} noValidate>
     <section className="ffos-form-section"><label className="ffos-form-label" htmlFor="expense-amount">مبلغ</label>
       <div className="ffos-amount-wrap"><input id="expense-amount" className="ffos-amount-input" type="text" inputMode="numeric" autoComplete="off" placeholder="۰" dir="ltr" value={amount} onChange={(event) => setAmount(formatAmount(event.target.value))} /><span>تومان</span></div></section>
+    <section className="ffos-form-section"><label htmlFor="expense-account">حساب پرداخت</label><select id="expense-account" value={accountId} onChange={e => setAccountId(e.target.value)}><option value="">{editingExpense?.sourceLegacyKey ? 'هزینهٔ قدیمی بدون حساب' : 'انتخاب حساب'}</option>{accounts.filter(a => !a.archivedAt || a.id === editingExpense?.accountId).map(a => <option key={a.id} value={a.id}>{a.name}{a.archivedAt ? ' (بایگانی)' : ''}</option>)}</select>{!accounts.length && <p>ابتدا در بخش حساب‌ها یک حساب بسازید.</p>}{editingExpense?.sourceLegacyKey && <p className="ffos-muted">اتصال هزینهٔ قدیمی به حساب، موجودی را کاهش می‌دهد. ماندهٔ آغازین را با تاریخ هزینه هماهنگ کنید تا دوباره شمرده نشود.</p>}</section>
     <section className="ffos-form-section"><label className="ffos-form-label" htmlFor="store-name">فروشگاه یا محل هزینه</label>
       <input id="store-name" value={storeName} onChange={(event) => setStoreName(event.target.value)} placeholder="مثلاً سوپرمارکت محله" autoComplete="off" /></section>
     <section className="ffos-form-section"><span className="ffos-form-label" id="category-label">دسته‌بندی</span>
       <div className="ffos-choice-grid" role="group" aria-labelledby="category-label">{featured.map((item) => <button type="button" key={item} className={`ffos-choice ${category === item ? "is-selected" : ""}`} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}{category === item && <Check size={16} />}</button>)}</div>
-      <label className="ffos-secondary-label" htmlFor="expense-category">همه دسته‌ها</label><select id="expense-category" value={category} onChange={(event) => setCategory(event.target.value)}>{categories.map((item) => <option key={item} value={item}>{item}</option>)}</select></section>
+      <label className="ffos-secondary-label" htmlFor="expense-category">همه دسته‌ها</label><select id="expense-category" value={category} onChange={(event) => setCategory(event.target.value)}>{[...new Set([...categories, category])].map((item) => <option key={item} value={item}>{item}</option>)}</select></section>
     <section className="ffos-form-section"><span className="ffos-form-label">تاریخ</span>
       <button className="ffos-date-trigger" type="button" aria-expanded={calendarOpen} onClick={() => setCalendarOpen((open) => !open)}><CalendarDays size={20} /><span>{formatJalaliNumeric(date)}</span></button>
       {calendarOpen && <div className="ffos-calendar"><Calendar value={date} onChange={(selected) => { setDate(selected); setCalendarOpen(false); }} /></div>}</section>

@@ -1,159 +1,204 @@
 import { useRef, useState } from "react";
-import { Capacitor } from "@capacitor/core";
-import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
-import { Share } from "@capacitor/share";
 import { clearExpenses } from "../services/expenseService";
 import {
-  createExpenseBackup,
-  parseExpenseBackup,
-  restoreExpenseBackup,
-  type ExpenseBackup as ExpenseBackupFile,
-} from "../services/backupService";
-
-type Props = {
+  getFinancialSnapshot,
+  parseFinancialBackup,
+  restoreFinancialBackup,
+} from "../services/financialService";
+import type { FinancialSnapshot } from "../models/Financial";
+import {
+  MigrationBlocked,
+  type MigrationIssue,
+} from "../lib/financialMigration";
+import { downloadJson } from "../lib/backupFiles";
+import LegacyCorrections from "./LegacyCorrections";
+export default function ExpenseBackup({
+  currentCount,
+  onRestored,
+}: {
   currentCount: number;
   onRestored: () => void;
-};
-
-export default function ExpenseBackup({ currentCount, onRestored }: Props) {
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedBackup, setSelectedBackup] = useState<ExpenseBackupFile | null>(null);
+  const [selected, setSelected] = useState<FinancialSnapshot | null>(null);
   const [fileName, setFileName] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-
-  async function downloadBackup() {
+  const [raw, setRaw] = useState("");
+  const [issues, setIssues] = useState<MigrationIssue[]>([]);
+  const [legacy, setLegacy] = useState(false);
+  async function download() {
     setBusy(true);
     setMessage("");
     try {
-      const backup = await createExpenseBackup();
-      if (Capacitor.isNativePlatform()) {
-        const path = `ffos-backup-${backup.exportedAt.replace(/[:.]/g, "-")}.json`;
-        const file = await Filesystem.writeFile({
-          path,
-          data: JSON.stringify(backup, null, 2),
-          directory: Directory.Cache,
-          encoding: Encoding.UTF8,
-        });
-        await Share.share({
-          title: "فایل پشتیبان FFOS",
-          url: file.uri,
-          dialogTitle: "ذخیره یا اشتراک فایل پشتیبان",
-        });
-        setMessage("فایل پشتیبان آماده شد. ذخیره‌شدن آن را در برنامهٔ انتخابی بررسی کنید.");
-        return;
-      }
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `ffos-backup-${backup.exportedAt.slice(0, 10)}.json`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      setMessage(`پشتیبان شامل ${backup.expenses.length} هزینه آمادهٔ دانلود شد.`);
-    } catch {
-      setMessage("ساخت فایل پشتیبان انجام نشد. دوباره تلاش کنید.");
+      setMessage(await downloadJson(await getFinancialSnapshot()));
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "پشتیبان آماده نشد.");
     } finally {
       setBusy(false);
     }
   }
-
-  async function selectFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    setSelectedBackup(null);
+  async function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    setSelected(null);
+    setIssues([]);
+    setRaw("");
     setFileName("");
     setMessage("");
     if (!file) return;
-
     if (file.size > 10 * 1024 * 1024) {
-      setMessage("حجم فایل پشتیبان نباید بیش از ۱۰ مگابایت باشد.");
-      event.target.value = "";
+      setMessage("حجم فایل نباید بیش از ۱۰ مگابایت باشد.");
+      e.target.value = "";
       return;
     }
-
-    try {
-      const backup = parseExpenseBackup(await file.text());
-      setSelectedBackup(backup);
-      setFileName(file.name);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "خواندن فایل پشتیبان انجام نشد.");
-      event.target.value = "";
-    }
-  }
-
-  async function restoreBackup() {
-    if (!selectedBackup || busy) return;
-    const confirmed = window.confirm(
-      `با بازیابی «${fileName}»، همهٔ ${currentCount} هزینهٔ فعلی حذف و ${selectedBackup.expenses.length} هزینهٔ فایل جایگزین می‌شوند. ادامه می‌دهید؟`
-    );
-    if (!confirmed) return;
-
     setBusy(true);
-    setMessage("");
     try {
-      await restoreExpenseBackup(selectedBackup);
-      setSelectedBackup(null);
-      setFileName("");
-      if (inputRef.current) inputRef.current.value = "";
-      onRestored();
-      setMessage("بازیابی با موفقیت انجام شد.");
-    } catch {
-      setMessage("بازیابی انجام نشد؛ داده‌های قبلی حفظ شدند.");
+      const text = await file.text();
+      setRaw(text);
+      setFileName(file.name);
+      const envelope = JSON.parse(text);
+      setLegacy(envelope.format === "ffos-expenses");
+      setSelected(parseFinancialBackup(text));
+    } catch (error) {
+      if (error instanceof MigrationBlocked) setIssues(error.issues);
+      setMessage(
+        error instanceof Error ? error.message : "خواندن فایل انجام نشد.",
+      );
     } finally {
       setBusy(false);
     }
   }
-
-  async function deleteAllData() {
-    if (busy || currentCount === 0) return;
-    const confirmed = window.confirm(
-      `همهٔ ${currentCount} هزینهٔ ذخیره‌شده روی این دستگاه برای همیشه پاک می‌شوند. اگر می‌خواهید بعداً آن‌ها را برگردانید، ابتدا فایل پشتیبان JSON بگیرید. ادامه می‌دهید؟`
-    );
-    if (!confirmed) return;
-
+  async function restore() {
+    if (!selected || busy) return;
+    if (
+      !window.confirm(
+        `با بازیابی «${fileName}»، تمام حساب‌ها، تراکنش‌ها و تاریخچهٔ فعلی با فایل جایگزین می‌شوند.${legacy ? " فایل نسخهٔ قبلی فقط هزینه دارد؛ حساب‌های فعلی حفظ نمی‌شوند." : ""} ابتدا پشتیبان فعلی را نگه دارید. ادامه می‌دهید؟`,
+      )
+    )
+      return;
     setBusy(true);
-    setMessage("");
+    try {
+      await restoreFinancialBackup(selected);
+      setSelected(null);
+      setRaw("");
+      setFileName("");
+      if (inputRef.current) inputRef.current.value = "";
+      onRestored();
+      setMessage("بازیابی کامل انجام شد.");
+    } catch (e) {
+      setMessage(
+        e instanceof Error
+          ? e.message
+          : "بازیابی انجام نشد؛ دادهٔ قبلی حفظ شد.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function remove() {
+    if (
+      busy ||
+      !currentCount ||
+      !window.confirm(
+        "همهٔ هزینه‌های فعال حذف شوند؟ حساب‌ها و درآمدها حفظ می‌شوند؛ هزینه‌ها در بخش حساب‌ها قابل بازگردانی هستند.",
+      )
+    )
+      return;
+    setBusy(true);
     try {
       await clearExpenses();
-      setSelectedBackup(null);
-      setFileName("");
-      if (inputRef.current) inputRef.current.value = "";
       onRestored();
-      setMessage("همهٔ هزینه‌ها از این دستگاه پاک شدند. اکنون می‌توانید داده‌های جدید وارد کنید.");
-    } catch {
-      setMessage("پاک‌کردن داده‌ها انجام نشد. دوباره تلاش کنید.");
+      setMessage("هزینه‌ها حذف شدند و قابل بازگردانی هستند.");
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "حذف انجام نشد.");
     } finally {
       setBusy(false);
     }
   }
-
   return (
-    <section className="expense-panel" aria-labelledby="expense-backup-title">
-      <h2 id="expense-backup-title">پشتیبان‌گیری و بازیابی</h2>
-      <p className="expense-help">فایل پشتیبان شامل همهٔ هزینه‌هاست و برای بازیابی در همین برنامه استفاده می‌شود. آن را در جای امن نگه دارید.</p>
+    <section className="expense-panel">
+      <h2>پشتیبان‌گیری و بازیابی</h2>
+      <p className="expense-help">
+        پشتیبان نسخهٔ ۲ شامل تمام حساب‌ها، تراکنش‌ها، حذف‌شده‌ها، تاریخچه و منبع
+        هزینه‌های قبلی است. این فایل را خارج از برنامه نگه دارید. نسخه‌های قبلی
+        برنامه نمی‌توانند آن را بازیابی کنند.
+      </p>
       <div className="expense-backup-actions">
-        <button className="expense-button" type="button" onClick={downloadBackup} disabled={busy}>دریافت فایل پشتیبان</button>
+        <button
+          className="expense-button"
+          disabled={busy}
+          onClick={() => void download()}
+        >
+          دریافت فایل پشتیبان
+        </button>
         <div className="expense-field">
-          <span className="ffos-file-label">فایل پشتیبان JSON</span>
-          <input className="ffos-hidden-file" ref={inputRef} id="expense-backup-file" type="file" accept=".json,application/json" onChange={selectFile} disabled={busy} />
-          <label className="ffos-file-picker" htmlFor="expense-backup-file">{fileName || "انتخاب فایل از دستگاه"}</label>
+          <input
+            className="ffos-hidden-file"
+            ref={inputRef}
+            id="expense-backup-file"
+            type="file"
+            accept=".json,application/json"
+            onChange={selectFile}
+            disabled={busy}
+          />
+          <label className="ffos-file-picker" htmlFor="expense-backup-file">
+            {fileName || "انتخاب فایل از دستگاه"}
+          </label>
         </div>
       </div>
-      {selectedBackup && (
+      {issues.length > 0 && (
+        <LegacyCorrections
+          issues={issues}
+          onApply={async (resolutions) => {
+            setSelected(parseFinancialBackup(raw, resolutions));
+            setIssues([]);
+            setMessage(
+              "اصلاح‌ها بررسی شدند؛ برای جایگزینی داده، بازیابی را تأیید کنید.",
+            );
+          }}
+        />
+      )}
+      {selected && (
         <div className="expense-restore-preview">
-          <p>فایل «{fileName}» شامل {selectedBackup.expenses.length} هزینه است. اکنون {currentCount} هزینه در برنامه دارید.</p>
-          <p>بازیابی همهٔ هزینه‌های فعلی را جایگزین می‌کند.</p>
-          <button className="expense-button expense-button--primary" type="button" onClick={restoreBackup} disabled={busy}>بازیابی داده‌ها</button>
+          <p>
+            فایل «{fileName}»: {selected.accounts.length} حساب،{" "}
+            {selected.transactions.filter((t) => !t.deletedAt).length} تراکنش
+            فعال، {selected.transactions.filter((t) => !!t.deletedAt).length}{" "}
+            حذف‌شده.
+          </p>
+          <p>
+            تمام داده‌های مالی فعلی جایگزین می‌شوند.
+            {legacy &&
+              " فایل قدیمی فقط هزینه دارد و حساب‌های فعلی را جایگزین می‌کند."}
+          </p>
+          <button
+            className="expense-button expense-button--primary"
+            disabled={busy}
+            onClick={() => void restore()}
+          >
+            بازیابی داده‌ها
+          </button>
         </div>
       )}
       <div className="expense-delete-all">
-        <h3>پاک‌کردن همهٔ داده‌ها</h3>
-        <p>این کار همهٔ هزینه‌های ذخیره‌شده در این برنامه روی همین دستگاه را حذف می‌کند. برای نگه‌داشتن نسخه‌ای از آن‌ها، ابتدا فایل پشتیبان JSON بگیرید.</p>
-        <button className="expense-button expense-button--danger" type="button" onClick={deleteAllData} disabled={busy || currentCount === 0}>پاک‌کردن همهٔ هزینه‌ها</button>
+        <h3>حذف هزینه‌ها</h3>
+        <p>
+          فقط هزینه‌ها از گزارش و موجودی کنار گذاشته می‌شوند و در بخش حساب‌ها
+          قابل بازگردانی‌اند.
+        </p>
+        <button
+          className="expense-button expense-button--danger"
+          disabled={busy || !currentCount}
+          onClick={() => void remove()}
+        >
+          حذف همهٔ هزینه‌ها
+        </button>
       </div>
-      {message && <p className="expense-backup-message" role="status">{message}</p>}
+      {message && (
+        <p className="expense-backup-message" role="status">
+          {message}
+        </p>
+      )}
     </section>
   );
 }

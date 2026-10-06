@@ -1,38 +1,59 @@
-import { db } from "../database/db";
-import { normalizeExpenseDate } from "../lib/expenseDate";
 import type { Expense } from "../models/Expense";
-
-export async function addExpense(expense: Expense) {
-  try {
-    return await db.expenses.add(expense);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+import type { FinancialSnapshot } from "../models/Financial";
+import { TOMAN } from "../models/Financial";
+import {
+  clearFinancialExpenses,
+  getFinancialSnapshot,
+  saveFinancialTransaction,
+  setTransactionDeleted,
+} from "./financialService";
+export function expensesFromSnapshot(data: FinancialSnapshot): Expense[] {
+  return data.transactions.flatMap((tx) =>
+    tx.type === "expense" && !tx.deletedAt && tx.currencyId === TOMAN
+      ? [
+          {
+            id: tx.id,
+            storeName: tx.title,
+            amount: tx.amountMinor,
+            category: tx.categoryNameSnapshot ?? "",
+            paymentMethod: tx.paymentMethod ?? "",
+            description: tx.description ?? "",
+            date: tx.date,
+            createdAt: tx.createdAt,
+            confirmed: tx.confirmed,
+            accountId: tx.accountId,
+            revision: tx.revision,
+            sourceLegacyKey: tx.sourceLegacyKey,
+          },
+        ]
+      : [],
+  );
 }
-
-export async function updateExpense(expense: Expense) {
-  try {
-    return await db.expenses.put(expense);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
 export async function getExpenses() {
-  const expenses = await db.expenses.orderBy("id").reverse().toArray();
-
-  return expenses.map((expense) => ({
-    ...expense,
-    date: normalizeExpenseDate(expense.date) ?? expense.date,
-  }));
+  return expensesFromSnapshot(await getFinancialSnapshot());
 }
-
-export async function deleteExpense(id: number) {
-  return db.expenses.delete(id);
+export function addExpense(expense: Expense) {
+  return save(expense);
 }
-
-export async function clearExpenses() {
-  return db.expenses.clear();
+export function updateExpense(expense: Expense) {
+  return save(expense);
 }
+function save(e: Expense) {
+  return saveFinancialTransaction({
+    id: e.id === undefined ? undefined : String(e.id),
+    revision: e.revision,
+    type: "expense",
+    date: e.date,
+    title: e.storeName,
+    amountMinor: e.amount,
+    accountId: e.accountId,
+    categoryName: e.category,
+    paymentMethod: e.paymentMethod,
+    description: e.description,
+    confirmed: e.confirmed,
+  });
+}
+export function deleteExpense(id: number | string, revision: number) {
+  return setTransactionDeleted(String(id), true, revision);
+}
+export const clearExpenses = clearFinancialExpenses;

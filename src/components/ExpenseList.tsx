@@ -10,9 +10,9 @@ function formatDate(value: string) {
 }
 export default function ExpenseList({ expenses, compact = false, onExpenseDeleted, onExpenseEdit }: Props) {
   const [error, setError] = useState("");
-  async function remove(id: number) {
+  async function remove(id: number | string, revision: number) {
     if (!window.confirm("آیا از حذف این هزینه مطمئن هستید؟")) return;
-    try { await deleteExpense(id); setError(""); onExpenseDeleted(); }
+    try { await deleteExpense(id, revision); setError(""); onExpenseDeleted(); }
     catch { setError("حذف هزینه انجام نشد. دوباره تلاش کنید."); }
   }
   if (expenses.length === 0) return <div className="ffos-empty-card"><span aria-hidden="true">✦</span><h3>هنوز هزینه‌ای برای نمایش نیست</h3><p>هزینه‌ای ثبت کنید یا فیلترها را تغییر دهید.</p></div>;
@@ -24,7 +24,7 @@ export default function ExpenseList({ expenses, compact = false, onExpenseDelete
         {!compact && expense.description?.trim() && <p className="ffos-expense-description">{expense.description}</p>}</div>
       <div className="ffos-expense-meta"><strong>{expense.amount.toLocaleString("fa-IR")} <small>تومان</small></strong><span><CalendarDays size={13} /> {formatDate(expense.date)}</span></div>
       {!compact && <div className="ffos-expense-actions"><button type="button" onClick={() => onExpenseEdit(expense)} aria-label={`ویرایش ${expense.storeName}`}><Pencil size={16} /> ویرایش</button>
-        <button type="button" className="is-danger" onClick={() => { if (expense.id !== undefined) void remove(expense.id); }} aria-label={`حذف ${expense.storeName}`}><Trash2 size={16} /> حذف</button></div>}
+        <button type="button" className="is-danger" onClick={() => { if (expense.id !== undefined) void remove(expense.id, expense.revision!); }} aria-label={`حذف ${expense.storeName}`}><Trash2 size={16} /> حذف</button></div>}
     </article>)}
   </div>;
 }

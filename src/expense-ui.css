@@ -153,3 +153,9 @@
   .ffos-report-summary { grid-template-columns:1fr 1fr; }
   .ffos-report-summary strong { font-size:1.12rem; }
 }
+
+.ffos-financial-row { margin-block: 12px; padding: 18px; }
+
+
+.ffos-financial-row details { overflow-wrap: anywhere; margin-block: 10px; }
+.ffos-card label input[type="checkbox"] { width: auto; min-height: auto; }

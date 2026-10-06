@@ -12,6 +12,7 @@ jobs:
   build-and-release:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[android-release]')
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,49 +23,79 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - run: npm ci
-      - run: npm test
-      - run: npm run lint
-      - run: npm run build
-      - run: npx cap sync android
-      - name: Prepare release signing key
+      - name: Prepare stable signing key
         env:
           FFOS_KEYSTORE_BASE64: ${{ secrets.FFOS_KEYSTORE_BASE64 }}
           FFOS_KEYSTORE_PASSWORD: ${{ secrets.FFOS_KEYSTORE_PASSWORD }}
           FFOS_KEY_ALIAS: ${{ secrets.FFOS_KEY_ALIAS }}
           FFOS_KEY_PASSWORD: ${{ secrets.FFOS_KEY_PASSWORD }}
+          FFOS_SIGNING_CERT_SHA256: ${{ vars.FFOS_SIGNING_CERT_SHA256 }}
+        shell: bash
         run: |
-          for variable in FFOS_KEYSTORE_BASE64 FFOS_KEYSTORE_PASSWORD FFOS_KEY_ALIAS FFOS_KEY_PASSWORD; do
+          for variable in FFOS_KEYSTORE_BASE64 FFOS_KEYSTORE_PASSWORD FFOS_KEY_ALIAS FFOS_KEY_PASSWORD FFOS_SIGNING_CERT_SHA256; do
             if [ -z "${!variable}" ]; then
-              echo "Missing required Android signing secret: $variable" >&2
+              echo "Missing required signing setting: $variable" >&2
               exit 1
             fi
           done
+          expected="$(printf '%s' "$FFOS_SIGNING_CERT_SHA256" | tr -d '[:space:]:' | tr '[:upper:]' '[:lower:]')"
+          [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
+          umask 077
           printf '%s' "$FFOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/ffos-release.jks"
+          keytool -exportcert -storetype JKS -keystore "$RUNNER_TEMP/ffos-release.jks" \
+            -storepass:env FFOS_KEYSTORE_PASSWORD -alias "$FFOS_KEY_ALIAS" \
+            -file "$RUNNER_TEMP/ffos-release-cert.der"
+          actual="$(openssl x509 -inform DER -in "$RUNNER_TEMP/ffos-release-cert.der" -noout -fingerprint -sha256 | cut -d= -f2 | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          test "$actual" = "$expected"
           echo "FFOS_KEYSTORE_PATH=$RUNNER_TEMP/ffos-release.jks" >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+      - run: npx cap sync android
       - name: Build signed release APK
+        working-directory: android
         env:
           FFOS_KEYSTORE_PASSWORD: ${{ secrets.FFOS_KEYSTORE_PASSWORD }}
           FFOS_KEY_ALIAS: ${{ secrets.FFOS_KEY_ALIAS }}
           FFOS_KEY_PASSWORD: ${{ secrets.FFOS_KEY_PASSWORD }}
         run: |
-          chmod +x android/gradlew
-          cd android
+          chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
-      - name: Verify APK signature
+      - name: Verify APK certificate, application ID and upgrade version
+        env:
+          FFOS_SIGNING_CERT_SHA256: ${{ vars.FFOS_SIGNING_CERT_SHA256 }}
+        shell: bash
         run: |
           apk="android/app/build/outputs/apk/release/app-release.apk"
           apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
           test -n "$apksigner"
-          "$apksigner" verify --verbose "$apk"
+          test -n "$aapt"
+          verification="$("$apksigner" verify --verbose --print-certs "$apk")"
+          printf '%s\n' "$verification"
+          actual="$(printf '%s\n' "$verification" | sed -nE 's/^(Signer #[0-9]+ certificate|V[0-9]+ Signer: certificate) SHA-256 digest: //p' | tr -d '[:space:]:' | tr '[:upper:]' '[:lower:]')"
+          expected="$(printf '%s' "$FFOS_SIGNING_CERT_SHA256" | tr -d '[:space:]:' | tr '[:upper:]' '[:lower:]')"
+          test "$actual" = "$expected"
+          package_info="$("$aapt" dump badging "$apk" | sed -n '1p')"
+          echo "$package_info"
+          [[ "$package_info" == "package: name='io.github.msm353.ffos'"* ]]
+          [[ "$package_info" == *" versionCode='5' "* ]]
+          version="$(node -p "require('./package.json').version")"
+          [[ "$package_info" == *" versionName='$version' "* ]]
       - name: Publish APK on GitHub
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="v$(node -p "require('./package.json').version")"
-          apk="android/app/build/outputs/apk/release/app-release.apk"
-          gh release create "$tag" "$apk#FFOS-$tag.apk" \
+          version="$(node -p "require('./package.json').version")"
+          notes="docs/RELEASE-$version.md"
+          test -f "$notes"
+          gh release create "v$version" "android/app/build/outputs/apk/release/app-release.apk#FFOS-v$version.apk" \
             --target "$GITHUB_SHA" \
-            --title "FFOS $tag (Android beta)" \
-            --notes-file docs/RELEASE-0.1.2-beta.md \
+            --title "FFOS v$version (Android beta)" \
+            --notes-file "$notes" \
             --prerelease
+      - name: Remove temporary signing material
+        if: always()
+        shell: bash
+        run: rm -f -- "$RUNNER_TEMP/ffos-release.jks" "$RUNNER_TEMP/ffos-release-cert.der"
