@@ -20,6 +20,11 @@ click Restore and cancel the browser confirmation. Both original records must
 remain after a reload. Do not mark this check passed unless cancellation was
 actually observed. See `docs/PREPARATION.md` for results and outstanding checks.
 
+These dates are in March 2024. The home total shows the current Jalali month,
+and reports only offer recent periods; those totals can correctly show zero.
+For preservation checks, inspect both individual amounts (125,000 and 75,000),
+not the current-month total or the recent-period reports.
+
 For the three valid-JSON rejection files, keep the two original records installed,
 select each file, check the error and absence of a restore preview, then reload.
 The two records and their 200,000 toman total must remain. Never restore the
